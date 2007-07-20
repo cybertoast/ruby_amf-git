@@ -1,3 +1,4 @@
+#This Install script is for Rails Plugin Installation. If using the RubyAMF standalone this is not needed.
 begin
   require 'fileutils'
   FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/app/rubyamf_controller.rb","./app/controllers/rubyamf_controller.rb",false)
@@ -15,7 +16,7 @@ begin
     File.open("./config/environment.rb","a") do |f|
       f.puts "\nMime::Type.register \"application/x-amf\", :amf"
     end
-  end  
+  end
 rescue Exception => e
   puts "ERROR INSTALLING RUBYAMF: " + e.message
 end
