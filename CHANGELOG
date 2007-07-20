@@ -1,3 +1,9 @@
+--changes 1.2
+####RAILS
+#support for respond_to/format.amf { render :amf => content }. You must add a mime type into railsapp/config/environment.rb (Mime::Type.register "application/x-amf", :amf)
+See the page http://wiki.rubyamf.org/wiki/show/AmfRest for more info
+#took out some puts statements
+
 --changes 1.1
 #FaultObjects cannot be "raised" from service methods, they must be returned. If raised, a custom error message tells you not to.
 #cleaned up some authentication code, less logic
