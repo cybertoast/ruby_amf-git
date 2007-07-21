@@ -1,3 +1,10 @@
+--changes 1.3
+#added active record error handling, return an active record with errors and it sends back the first error in the errors hash as a string (EX: "login already taken")
+#changed active records to openstructs in the active_record_adapter, to allow for custom client side class mappings
+
+###RAILS
+#rails installer (ruby script/plugin install svn://rubyforge.org/var/svn/rubyamf/tags/current/rubyamf)
+
 --changes 1.2
 ####RAILS
 #support for respond_to/format.amf { render :amf => content }. You must add a mime type into railsapp/config/environment.rb (Mime::Type.register "application/x-amf", :amf)

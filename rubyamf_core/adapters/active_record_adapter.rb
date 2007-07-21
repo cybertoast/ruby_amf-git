@@ -27,6 +27,14 @@ class ActiveRecordAdapter
 	end
 	
 	def run_multiple(results)
+	  #handle ActiveRecord errors
+		if !results[0].errors.empty?
+	    results[0].errors.each do |k,v|
+	      raise RUBYAMFException.new(RUBYAMFException.ACTIVE_RECORD_ERRORS, "#{k} #{v}")
+	      break
+	    end
+	  end
+	  
 		column_names = results[0].class.column_names #store the column names
 		row_count = results.length #get the number of rows in the Mysql::Result
 		initial_data = Array.new #payload holder
@@ -49,6 +57,14 @@ class ActiveRecordAdapter
 	end
 	
 	def run_single(results)
+	  #handle active record errors
+	  if !results.errors.empty?
+	    results.errors.each do |k,v|
+	      raise RUBYAMFException.new(RUBYAMFException.ACTIVE_RECORD_ERRORS, "#{k} #{v}")
+	      break
+	    end
+	  end
+	  
 		column_names = results.class.column_names #store the column names
 		initial_data = Array.new #payload holder
 		begin
