@@ -45,6 +45,9 @@ class RUBYAMFException < Exception
 	#when the Rails ActionController Filter chain haults
 	@FILTER_CHAIN_HAULTED = 'RAILS_ACTION_CONTROLLER_FILTER_CHAIN_HAULTED'
   
+  #when active record errors
+  @ACTIVE_RECORD_ERRORS = 'ACTIVE_RECORD_ERRORS'
+  
   attr_accessor :message
 	attr_accessor :etype
 	attr_accessor :ebacktrace
@@ -67,6 +70,7 @@ class RUBYAMFException < Exception
 	  attr_accessor :INTERNAL_ERROR
 	  attr_accessor :UNSUPPORTED_AMF0_TYPE
 	  attr_accessor :FILTER_CHAIN_HAULTED
+	  attr_accessor :ACTIVE_RECORD_ERRORS
 	end
   
 	def initialize(type,msg)
