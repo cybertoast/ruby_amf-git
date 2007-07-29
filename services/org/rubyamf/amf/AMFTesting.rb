@@ -8,8 +8,8 @@ require 'rexml/document'
 require 'ostruct'
 include REXML
 require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/datas'
-require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/persons'
-require RUBYAMF_SERVICES + 'org/rubyamf/amf/vo/person'
+#require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/persons'
+#require RUBYAMF_SERVICES + 'org/rubyamf/amf/vo/person'
 require RUBYAMF_HELPERS + 'fault_object'
 require RUBYAMF_CORE + 'util/net_debug'
 require RUBYAMF_HELPERS + 'active_record_connector'
@@ -17,18 +17,18 @@ require RUBYAMF_HELPERS + 'active_record_connector'
 #simple data echoing tests
 class AMFTesting
   
-  include ActiveRecordConnector
+  #include ActiveRecordConnector
   
   def _authenticate(user,pass)
     #return FaultObject.new(1, 'Authentication Failed')
-    @auth = true if user != false && pass != false
+    #@auth = true if user != false && pass != false
   end
   
   def before_filter
     #return false
     #return FaultObject.new(1, 'Authentication Failed')
-    if !@auth then return FaultObject.new(1, 'Authentication Failed') end
-    ar_connect(RUBYAMF_SERVICES + 'org/rubyamf/amf/test.yaml')
+    #if !@auth then return FaultObject.new(1, 'Authentication Failed') end
+    #ar_connect(RUBYAMF_SERVICES + 'org/rubyamf/amf/test.yaml')
   end
 
 	def debugTrace
@@ -45,6 +45,11 @@ class AMFTesting
     NetDebug.Trace(getFloat)
     NetDebug.Trace(getXML)
     return true
+	end
+	
+	def voPassThrough(myVo = nil)
+	  puts myVo.inspect
+	  myVo
 	end
 	
 	def testSession

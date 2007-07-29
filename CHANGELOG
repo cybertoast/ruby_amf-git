@@ -1,6 +1,7 @@
 --changes 1.3
 #added active record error handling, return an active record with errors and it sends back the first error in the errors hash as a string (EX: "login already taken")
-#changed active records to openstructs in the active_record_adapter, to allow for custom client side class mappings
+-#-changed active records to openstructs in the active_record_adapter, to allow for custom client side class mappings
+-#-handle new recursive active_record adapter in the serializer
 
 ###RAILS
 #rails installer (ruby script/plugin install svn://rubyforge.org/var/svn/rubyamf/tags/current/rubyamf)
@@ -123,3 +124,4 @@ See the page http://wiki.rubyamf.org/wiki/show/AmfRest for more info
 #shifted in the RequestStore.SERVICE_PATH to $:. When using require in a service, start from where the top of the declared service directory
 #minor benchmarking and profiling, this things pretty fast.
 #Added RUBYAMF_SERVICES global var. This is for services when using the require statement. If you need to require anything of your own, use this is the prefix, then build from there. As usually you'll need to require rubygems. But rubygems screws with the load path. So chances are everything will error out if you don't use this new variable.
+

@@ -5,6 +5,7 @@ require 'app/amf'
 require 'date'
 require 'exception/rubyamf_exception'
 require 'io/read_write'
+require 'util/vo_util'
 require 'kconv'
 require 'rexml/document'
 include RUBYAMF::AMF
@@ -226,7 +227,7 @@ class AMFDeserializer
     
     while ((b & 0x80) != 0 && n < 3)
         result = result << 7
-        result = result | (b & 0x7f)
+        result = result | (b.to_i & 0x7f)
         b = read_word8
         n = n + 1
     end
@@ -378,7 +379,7 @@ class AMFDeserializer
         if classReference < @stored_defs.length
           classDefinition = @stored_defs[classReference]
         else
-  				raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_DEFINITION_REFERENCE_ERROR, "Reference to non existant class definition #{classReference}"))
+  				raise RUBYAMFException.new(RUBYAMFException.UNDEFINED_DEFINITION_REFERENCE_ERROR, "Reference to non existant class definition #{classReference}")
         end
       else
         className = read_amf3_string
@@ -393,20 +394,13 @@ class AMFDeserializer
         end
     
         classDefinition = {"type" => className, "members" => classMembers, "externalizable" => externalizable, "dynamic" => dynamic}
-        
         @stored_defs << classDefinition
       end
       
-      #classDefinition = nil #this is temporary, even if you send custom objects, i'm typing it as generic object
-      isObject = false
-      #if classDefinition != nil
-        #TODO map to class here
-      #else
-      ob = OpenStruct.new
-      #end
+      ob = OpenStruct.new #initialize an empty OpenStruct value holder
       
-      #@stored_objects << ob #add to stored objects first, cicular references are needed.
-      type = classDefinition['type']
+      @stored_objects << ob #add to stored objects first, cicular references are needed.
+      type = classDefinition['type'] #get the className according to type
       
       if classDefinition['externalizable']
         if(type == 'flex.messaging.io.ArrayCollection')
@@ -433,11 +427,16 @@ class AMFDeserializer
           end
         end
         
+        #if type not nil and it is an OpenStruct, use VO Mapping
     		if(type != '' && ob.is_a?(OpenStruct))
     			ob._explicitType = type
+    			if VoUtil.getVoDefFromIncoming(type) != nil    			  
+    			  vo = VoUtil.getVoInstanceFromIncoming(type)
+            VoUtil.populateVoFromOpenStruct(vo,ob)
+    			  #return vo #TODO - fix me
+    			end
         end
       end
-
       return ob      
     end
 	end
@@ -459,7 +458,6 @@ class AMFDeserializer
       return ob
     end
   end
-  
   
   #AMF0	
 	def read_number

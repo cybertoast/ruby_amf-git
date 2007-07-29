@@ -48,6 +48,9 @@ class RUBYAMFException < Exception
   #when active record errors
   @ACTIVE_RECORD_ERRORS = 'ACTIVE_RECORD_ERRORS'
   
+  #vo errors
+  @VO_ERROR
+  
   attr_accessor :message
 	attr_accessor :etype
 	attr_accessor :ebacktrace
@@ -71,6 +74,7 @@ class RUBYAMFException < Exception
 	  attr_accessor :UNSUPPORTED_AMF0_TYPE
 	  attr_accessor :FILTER_CHAIN_HAULTED
 	  attr_accessor :ACTIVE_RECORD_ERRORS
+	  attr_accessor :VO_ERROR
 	end
   
 	def initialize(type,msg)
