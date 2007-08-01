@@ -1,5 +1,10 @@
 #Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 
+class Person
+  attr_accessor :name
+  attr_accessor :phone
+end
+
 require 'rubygems'
 require 'active_record'
 require 'mysql'
@@ -48,8 +53,12 @@ class AMFTesting
 	end
 	
 	def voPassThrough(myVo = nil)
-	  puts myVo.inspect
-	  myVo
+	  #puts myVo.inspect
+	  #return myVo
+	  r = Person.new
+	  r.name = "aaron"
+	  r.phone = "789787"
+	  return r
 	end
 	
 	def testSession
