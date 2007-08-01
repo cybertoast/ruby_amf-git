@@ -428,12 +428,12 @@ class AMFDeserializer
         end
         
         #if type not nil and it is an OpenStruct, use VO Mapping
-    		if(type != '' && ob.is_a?(OpenStruct))
+    		if type != '' && ob.is_a?(OpenStruct)
     			ob._explicitType = type
-    			if VoUtil.getVoDefFromIncoming(type) != nil    			  
+    			if VoUtil.getVoDefFromIncoming(type) != nil
     			  vo = VoUtil.getVoInstanceFromIncoming(type)
             VoUtil.populateVoFromOpenStruct(vo,ob)
-    			  #return vo #TODO - fix me
+    			  return vo #prematurly return the new VO object
     			end
         end
       end
