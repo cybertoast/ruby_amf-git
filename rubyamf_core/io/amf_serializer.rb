@@ -4,6 +4,7 @@ require 'app/amf'
 require 'date'
 require 'io/read_write'
 require 'ostruct'
+require 'util/vo_util'
 require 'rexml/document'
 include RUBYAMF::AMF
 
@@ -98,10 +99,10 @@ class AMFSerializer
 		      
 		elsif value.nil?
 			write_null
-
+      
     elsif (value.is_a?(Float))
 			write_number(value)
-
+      
     elsif (value.is_a?(Bignum))
 			write_number(value)
 		
@@ -192,9 +193,6 @@ class AMFSerializer
       elsif(value.is_a?(Hash))
         write_amf3_mixed_array(value)
     
-      elsif value.is_a?(ASRecordset) #TODO implement
-  			write_amf3_recordset(value) #send to generic AMF3 recorset as ArrayCollection
-    
       elsif(value.is_a?(DateTime))
         write_byte(AMF3_DATE)
   			write_time_as_amf3_date(value)
@@ -211,17 +209,36 @@ class AMFSerializer
         write_byte(AMF3_XML)
         write_amf3_xml(value)
       
+  		elsif (value.respond_to?(:to_xml))
+  			write_amf3_xml(value.to_xml)
+        
+      elsif value.is_a?(Object)
+        puts "IS AN OBJECT"
+        #vo = value
+        write_byte(AMF3_OBJECT)
+        if VoUtil.getVoDefFromMappedRubyObj(value.class) != nil
+  			  vo = VoUtil.getVoInstanceFromMappedRubyObj(value.class.to_s)
+          VoUtil.populateVoFromObject(vo,value)
+          puts vo.inspect
+          write_amf3_object(vo)
+        else
+          write_amf3_object(value)
+        end
+        
       elsif (value.is_a?(BeautifulSoup)) #see page on wiki, under "Recover Bad Xml"
         write_byte(AMF3_XML)
         write_amf3_xml(value)
-      
-  		elsif (value.respond_to?(:to_xml))
-  			write_amf3_xml(value.to_xml)
-
-  		else
-  			write_amf3_object(value)
   		end
   	rescue NameError => ne
+  	  #handle Beautiful_soup errors
+  	  if ne.message.match(/BeautifulSoup/)
+  	    begin
+  	      require "rubygems"
+  	      require "rubyful_soup"
+  	    rescue LoadError => le
+  	      raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, le.message)
+  	    end
+  	  end
   	end
   end
 
@@ -280,8 +297,12 @@ class AMFSerializer
 		  reference = i << 1
 			write_amf3_integer(reference)
 		else
-      if(value.is_a?(OpenStruct))
+			if !value.rmembers.nil?
+			  members = value.rmembers
+			elsif(value.is_a?(OpenStruct))
         members = value.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
+			else
+			  members = value.instance_variables.map{|mem| mem[1,mem.length]} #TODO - fix me anonymous Objects with no vo_mapping or OpenStruct
 			end
 			
 			#Type this as a dynamic object
@@ -298,7 +319,7 @@ class AMFSerializer
 			write_amf3_string(classname)
       members.each_with_index do |v,i|
         if(v == '_explicitType')
-          next #sip _explicitType member, will cause ReferenceErrors
+          next #skip _explicitType member, will cause ReferenceErrors
         end
         val = eval("value.#{v}")
         write_amf3_string(v)
