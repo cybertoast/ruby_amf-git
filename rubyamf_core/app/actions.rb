@@ -101,7 +101,7 @@ class InvokeAction
 		@amfbody = amfbody #store amfbody in member var
 		invoke
 	end
-
+  
 	#invoke the service call
 	def invoke
 		begin
@@ -238,7 +238,10 @@ class RailsInvokeAction
         @service_result = @service.run_target_with_filters(@amfbody.service_method_name)
 			else
 			  if RequestStore.use_params_hash
-				  @service.params = @amfbody.value
+				  @service.params = {}
+			    @amfbody.value.each_with_index do |v,k|
+			      @service.params[k] = v
+			    end
 				  @service_result = @service.run_target_with_filters(@amfbody.service_method_name)
         else
 			    args = @amfbody.value
