@@ -230,7 +230,11 @@ class RailsInvokeAction
         attr_accessor :params
         attr_accessor :cookies
         attr_accessor :session
+        attr_accessor :response
+        attr_accessor :request
       end
+      @service.response = RequestStore.rails_response
+      @service.request = RequestStore.rails_request
       @service.cookies = RequestStore.rails_cookies
       @service.session = RequestStore.rails_session
       

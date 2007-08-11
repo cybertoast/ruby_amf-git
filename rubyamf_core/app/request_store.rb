@@ -31,9 +31,13 @@ class RequestStore
   @rails_authentication
   @available_services = {}
   @auth_header = nil
+  @reload_services = false
+  
+  #Rails Specific Members
   @rails_cookies
   @rails_session
-  @reload_services = false
+  @rails_request
+  @rails_response
 
 	class << self
 	  attr_accessor :actions
@@ -61,9 +65,13 @@ class RequestStore
 	  attr_accessor :rails_authentication
 	  attr_accessor :available_services
 	  attr_accessor :auth_header
+	  
+	  #Rails Specific Members
 	  attr_accessor :rails_cookies
 	  attr_accessor :rails_session
 	  attr_accessor :reload_services
+	  attr_accessor :rails_request
+	  attr_accessor :rails_response
 	end
 
 end

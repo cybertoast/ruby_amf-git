@@ -31,6 +31,8 @@ class RubyamfController < ActionController::Base
   		RequestStore.rails_authentication = {}
   		RequestStore.rails_session = session
   		RequestStore.rails_cookies = cookies
+  		RequestStore.rails_request = request
+  		RequestStore.rails_response = response
   		
 		  #set the services path relative to this gateway.servlet file
   		gateway.services_path = RUBYAMF_SERVICES
