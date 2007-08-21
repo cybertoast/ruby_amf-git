@@ -10,6 +10,10 @@ require 'io/amf_deserializer' #get the deserializer
 require 'io/amf_serializer'
 include RUBYAMF::IO #de/serializers live in RUBYAMF::IO Module
 
+
+##I don't really use these tests. This is just an example for someone who wants to use the de/serializers in anything else. 
+
+
 class TestAMF < Test::Unit::TestCase
   
   #ALL TESTS ARE FORCED INTO AMF3 IN THE SERIALIZER / DESERIALIZERS
