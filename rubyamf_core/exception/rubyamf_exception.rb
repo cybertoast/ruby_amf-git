@@ -52,7 +52,7 @@ class RUBYAMFException < Exception
   @AMF_ERROR = 'AMF_ERROR'
   
   #vo errors
-  @VO_ERROR
+  @VO_ERROR = 'VO_ERROR'
   
   attr_accessor :message
 	attr_accessor :etype
