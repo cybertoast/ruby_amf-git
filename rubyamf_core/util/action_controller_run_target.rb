@@ -21,6 +21,7 @@ end
 class ActionController::Base
   
   attr_accessor :is_amf
+  attr_accessor :is_rubyamf #-> for simeon, love you man.
   attr_accessor :allow_after_filters
   attr_accessor :amf_content
   attr_accessor :used_render_amf
@@ -52,6 +53,7 @@ class ActionController::Base
   #run a target method with filters  
   def run_target_with_filters(method, args = [])
     self.is_amf = true
+    self.is_rubyamf = true
     self.allow_after_filters = false
     
     afters = []
