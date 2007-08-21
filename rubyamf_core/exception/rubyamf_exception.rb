@@ -48,6 +48,9 @@ class RUBYAMFException < Exception
   #when active record errors
   @ACTIVE_RECORD_ERRORS = 'ACTIVE_RECORD_ERRORS'
   
+  #whan amf data is incomplete or incorrect
+  @AMF_ERROR = 'AMF_ERROR'
+  
   #vo errors
   @VO_ERROR
   
@@ -75,6 +78,7 @@ class RUBYAMFException < Exception
 	  attr_accessor :FILTER_CHAIN_HAULTED
 	  attr_accessor :ACTIVE_RECORD_ERRORS
 	  attr_accessor :VO_ERROR
+	  attr_accessor :AMF_ERROR
 	end
   
 	def initialize(type,msg)
