@@ -21,7 +21,6 @@ class AMFSerializer
 	  @amfobj = amfobj
 		@stream = @amfobj.output_stream #grab the output stream for the amfobj
 	  serialize
-	  #Object.remove_const
 	end
 
 	#write a ruby obj as raw AMF - for Unit testing
@@ -72,7 +71,7 @@ class AMFSerializer
 			
 			#get the body obj at index
 			@body = @amfobj.get_body_at(i)
-			
+						
 			#write the response uri
 			write_utf(@body.response_uri)
 			
@@ -141,7 +140,10 @@ class AMFSerializer
       
 		elsif (value.respond_to?(:to_xml))
 			write_xml(value.to_xml)
-    
+			
+		elsif (value.class.to_s == 'BeautifulSoup')
+      write_xml(value.to_s)
+      
 		else
 			write_object(value)
 		end
@@ -149,97 +151,86 @@ class AMFSerializer
 
   #AMF3
   def write_amf3(value)
-    begin
-      if(value.nil?)
-        write_byte(AMF3_NULL)
-        #AMF3_UNDEFINED, no outgoing type of undefined is currently supported, as ruby doesn't have undefined
-      
-      elsif (value.is_a?(TrueClass) || value.is_a?(FalseClass))
-        if(value == true)
-         write_byte(AMF3_TRUE)
-        else
-          write_byte(AMF3_FALSE)
-        end
-            
-      elsif value.is_a?(ASRecordset)
-  			write_amf3_recordset(value)
-      
-      elsif(value.is_a?(Float))
-        write_byte(0x05)
-        write_double(value)
-      
-      elsif(value.is_a?(Bignum))
-        write_byte(0x05)
-        write_double(value)
-      
-      elsif(value.is_a?(Integer))
-        write_amf3_number(value)
-      
-      elsif(value.is_a?(Fixnum))
-        write_amf3_number(value)
+    if(value.nil?)
+      write_byte(AMF3_NULL)
+      #AMF3_UNDEFINED, no outgoing type of undefined is currently supported, as ruby doesn't have undefined
+    
+    elsif (value.is_a?(TrueClass) || value.is_a?(FalseClass))
+      if(value == true)
+       write_byte(AMF3_TRUE)
+      else
+        write_byte(AMF3_FALSE)
+      end
+          
+    elsif value.is_a?(ASRecordset)
+			write_amf3_recordset(value)
+    
+    elsif(value.is_a?(Integer))
+      write_amf3_number(value)
+    
+    elsif(value.is_a?(Float))
+      write_byte(0x05)
+      write_double(value)
+    
+    elsif(value.is_a?(Bignum))
+      write_byte(0x05)
+      write_double(value)
+    
+    elsif(value.is_a?(Fixnum))
+      write_amf3_number(value)
+
+    elsif(value.is_a?(String))
+      write_byte(AMF3_STRING)
+      write_amf3_string(value)
   
-      elsif(value.is_a?(String))
-        write_byte(AMF3_STRING)
-        write_amf3_string(value)
+    elsif (value.is_a?(OpenStruct)) #easiest way to represent 'objects' here
+      write_byte(AMF3_OBJECT)
+			write_amf3_object(value)
+  
+    elsif(value.is_a?(Array))
+      write_byte(AMF3_ARRAY)
+      write_amf3_array(value)
     
-      elsif (value.is_a?(OpenStruct)) #easiest way to represent 'objects' here
-        write_byte(AMF3_OBJECT)
-  			write_amf3_object(value)
+    elsif(value.is_a?(Hash))
+      write_amf3_mixed_array(value)
+  
+    elsif(value.is_a?(DateTime))
+      write_byte(AMF3_DATE)
+			write_time_as_amf3_date(value)
+  
+    elsif (value.is_a?(Date))
+      write_byte(AMF3_DATE)
+      write_amf3_date(value)
     
-      elsif(value.is_a?(Array))
-        write_byte(AMF3_ARRAY)
-        write_amf3_array(value)
+    elsif (value.is_a?(Time))
+      write_byte(AMF3_DATE)
+			write_time_as_amf3_date(value)
       
-      elsif(value.is_a?(Hash))
-        write_amf3_mixed_array(value)
+		elsif (value.is_a?(REXML::Document))
+      write_byte(AMF3_XML)
+      write_amf3_xml(value)
     
-      elsif(value.is_a?(DateTime))
-        write_byte(AMF3_DATE)
-  			write_time_as_amf3_date(value)
+		elsif (value.respond_to?(:to_xml))
+		  write_byte(AMF3_XML)
+			write_amf3_xml(value.to_xml)
     
-      elsif (value.is_a?(Date))
-        write_byte(AMF3_DATE)
-        write_amf3_date(value)
-      
-      elsif (value.is_a?(Time))
-        write_byte(AMF3_DATE)
-  			write_time_as_amf3_date(value)
-        
-  		elsif (value.is_a?(REXML::Document))
-        write_byte(AMF3_XML)
-        write_amf3_xml(value)
-      
-  		elsif (value.respond_to?(:to_xml))
-  			write_amf3_xml(value.to_xml)
-        
-      elsif value.is_a?(Object)
-        puts "IS AN OBJECT"
-        #vo = value
-        write_byte(AMF3_OBJECT)
-        if VoUtil.getVoDefFromMappedRubyObj(value.class) != nil
-  			  vo = VoUtil.getVoInstanceFromMappedRubyObj(value.class.to_s)
-          VoUtil.populateVoFromObject(vo,value)
-          puts vo.inspect
-          write_amf3_object(vo)
-        else
-          write_amf3_object(value)
+    elsif value.class.to_s == 'BeautifulSoup'
+      write_byte(AMF3_XML)
+      write_amf3_xml(value)
+    
+    elsif value.is_a?(Object)
+      write_byte(AMF3_OBJECT) #write object flag
+      map = VoUtil.getVoDefFromMappedRubyObj(value.class.to_s)#try to VO map against the object
+      #puts map.inspect
+      if map != nil
+        class << value
+          attr_accessor :_explicitType
         end
-        
-      elsif (value.is_a?(BeautifulSoup)) #see page on wiki, under "Recover Bad Xml"
-        write_byte(AMF3_XML)
-        write_amf3_xml(value)
-  		end
-  	rescue NameError => ne
-  	  #handle Beautiful_soup errors
-  	  if ne.message.match(/BeautifulSoup/)
-  	    begin
-  	      require "rubygems"
-  	      require "rubyful_soup"
-  	    rescue LoadError => le
-  	      raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, le.message)
-  	    end
-  	  end
-  	end
+        value._explicitType = map[:outgoing]
+      end
+      #puts value.inspect
+      write_amf3_object(value) #write the object        
+		end
   end
 
   def write_amf3_integer(value)
@@ -297,28 +288,36 @@ class AMFSerializer
 		  reference = i << 1
 			write_amf3_integer(reference)
 		else
-			if !value.rmembers.nil?
-			  members = value.rmembers
-			elsif(value.is_a?(OpenStruct))
-        members = value.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
-			else
-			  members = value.instance_variables.map{|mem| mem[1,mem.length]} #TODO - fix me anonymous Objects with no vo_mapping or OpenStruct
-			end
-			
+		  begin
+  			if value.rmembers != nil
+  			  members = value.rmembers
+  			elsif(value.is_a?(OpenStruct))
+          members = value.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
+  			else
+  			  members = value.instance_variables.map{|mem| mem[1,mem.length]}
+  			end
+		  rescue Exception => e
+		    #if exception from testing against value.rmembers is thrown, catch here and make sure to set members
+		    if(value.is_a?(OpenStruct))
+          members = value.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
+  			else
+  			  members = value.instance_variables.map{|mem| mem[1,mem.length]}
+  			end
+  	  end
+	    
 			#Type this as a dynamic object
 			write_byte(0x0B)
 			
+			classname = ""
 			if(value._explicitType != nil)
-			  classname = value._explicitType #TODO handle class mappings here
-			else
-			  classname = "" 
+			  classname = value._explicitType #override classname
 			end
-			
+						
       @stored_objects << value #add object here for circular references
       
 			write_amf3_string(classname)
       members.each_with_index do |v,i|
-        if(v == '_explicitType')
+        if v == '_explicitType' || v == 'rmembers'
           next #skip _explicitType member, will cause ReferenceErrors
         end
         val = eval("value.#{v}")
@@ -402,16 +401,17 @@ class AMFSerializer
   
   def write_amf3_recordset(value)
 		numObjects = 0
+    
 		if RequestStore.flex_messaging
 		  mode = 'ArrayCollection'
-			write_byte(0x0a)
-		  write_byte(0x07)
+			write_byte(AMF3_OBJECT)
+		  write_byte(AMF3_XML)
 			write_amf3_string("flex.messaging.io.ArrayCollection")
 			numObjects = numObjects + 1
 		end
 				
 		#array
-		write_byte(0x09)
+		write_byte(AMF3_ARRAY)
     numObjects = numObjects + 1
 				
 		numRows = value.row_count
@@ -421,20 +421,20 @@ class AMFSerializer
 		write_amf3_integer(toPack)
 		
 		#No string keys in this array
-	  write_byte(0x01)
+	  write_byte(AMF3_NULL)
 				
 		numCols = value.column_names.length
 		if(numRows > 0)
 			colNames = []
 			rows = value.initial_data
 			rows.each_with_index do |line,k|
-			  			  
-				#Write a non object code
-				write_byte(0x0A)
-				write_byte(0x0B)
-				write_byte(0x01)
+        
+				#write a non object code
+				write_byte(AMF3_OBJECT)
+				write_byte(AMF3_XML_STRING)
+				write_byte(AMF3_NULL)
 				numObjects = numObjects + 1
-
+        
 				0.upto(numCols - 1) do |i|
 					#column name
 					write_amf3_string(value.column_names[i])
@@ -443,23 +443,27 @@ class AMFSerializer
 					  write_amf3_number(v)
 					
 					elsif(v.is_a?(Float) || v.is_a?(Bignum) || v.is_a?(Fixnum))
-					  write_byte(0x05)
+					  write_byte(AMF3_NUMBER)
 					  write_double(v)
 					
 					elsif(v.is_a?(String))
-					  write_byte(0x06)
+					  write_byte(AMF3_STRING)
 						write_amf3_string(v)
 					
 					elsif(v.nil?)
 					  write_byte(AMF3_NULL)
 					
 					elsif(v.is_a?(Date))
-					  write_byte(0x06)
+					  write_byte(AMF3_STRING)
 					  write_amf3_string(v.to_s)
 					
 					elsif(v.is_a?(Time))
-					  write_byte(0x06)
+					  write_byte(AMF3_STRING)
 						write_amf3_string(v)
+          
+          elsif(v.is_a?(DateTime))
+            write_byte(AMF3_STRING)
+            write_amf3_string(v.to_s)
           
           elsif (v.is_a?(TrueClass) || v.is_a?(FalseClass))
             if(v == true)
@@ -625,7 +629,7 @@ class AMFSerializer
 	#write an object
 	def write_object(object)
 		begin
-  		if object._explicitType != nil && object.explicitType != ''
+  		if object._explicitType != nil
   			write_byte(16)
   			write_utf(object._explicitType)
   		else
@@ -635,27 +639,32 @@ class AMFSerializer
       write_byte(3)
     end
     
-		begin
-		  if !object.rmembers.nil?
-		    members = object.rmembers
-		  else
-		    #Get all the instance vars, and public methods of the object
-        members = object.marshal_dump.keys.map{|k| k.to_s}
-      end
-    rescue Exception => e
-      members = object.marshal_dump.keys.map{|k| k.to_s}
-    end
+	  begin
+			if object.rmembers != nil
+			  members = object.rmembers
+			elsif(object.is_a?(OpenStruct))
+        members = object.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
+			else
+			  members = object.instance_variables.map{|mem| mem[1,mem.length]}
+			end
+	  rescue Exception => e
+	    #if exception from testing against value.rmembers is thrown, catch here and make sure to set members
+	    if(object.is_a?(OpenStruct))
+        members = object.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
+			else
+			  members = object.instance_variables.map{|mem| mem[1,mem.length]}
+			end
+	  end
     
 		#Loop through the accessor method names, invoking each accessor on the object,writng each value
 		members.each do |key|
 		  begin
-  		  if key == nil || key == '' || key == 'method'
+  		  if key == nil || key == '' || key == 'method' || key == "_explicitType" || key == "rmembers"
   		    next
   		  end
   			write_utf(key)
   			write(eval("object.#{key}"))
   		rescue Exception => e
-  		  #next
   		end
 		end
     
@@ -664,7 +673,7 @@ class AMFSerializer
 		write_byte(9)
 	end
   
-	# writes a string of xml
+	#writes a string of xml
 	def write_xml(xml_string)
 		write_byte(AMF_XML)
 		write_long_utf(xml_string.to_s)

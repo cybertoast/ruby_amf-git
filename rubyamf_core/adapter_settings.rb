@@ -12,9 +12,10 @@ def adapters
 #~Adapters live in rubyamf_core/adapters/. in the array below, mysql_adapter is the mysql_adapter.rb file, and MysqlAdapter is the class
 #~defined in that file. Each adapter class must have a "user_adapter?" method defined that is used to determine if that adapter should 
 #~be used with the results passed to it. each Adapter file must also have a "run" method that is executed when the "use_adapter?" returns true
-#~you can look at either mysql_adapter or active_record_adapter
+#~you can look at either mysql_adapter or active_record_adapter for an example
 
-@adapters << ['active_record_adapter', 'ActiveRecordAdapter']
+@adapters << ['active_record_adapter', 'ActiveRecordAdapter'] #-> goes only 1 level deep into a result set (faster if not needing recursion)
+#@adapters << ['recursive_active_record_adapter', 'RecursiveActiveRecordAdapter'] #-> goes more then 1 level deep into a result set
 #@adapters << ['firebird_fireruby_adapter', 'FirebirdFirerubyAdapter']
 #@adapters << ['hypersonic_adapter','HypersonicAdapter']
 #@adapters << ['lafcadio_adapter','LafcadioAdapter']

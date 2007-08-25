@@ -21,7 +21,7 @@ end
 class ActionController::Base
   
   attr_accessor :is_amf
-  attr_accessor :is_rubyamf #-> for simeon, love you man.
+  attr_accessor :is_rubyamf #-> for simeon :)-
   attr_accessor :allow_after_filters
   attr_accessor :amf_content
   attr_accessor :used_render_amf

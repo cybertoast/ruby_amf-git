@@ -312,7 +312,7 @@ class ResultAdapterAction
     rescue Exception => e
       ramfe = RUBYAMFException.new(e.class.to_s, e.message.to_s) #translate the exception into a rubyamf exception
 			ramfe.ebacktrace = e.backtrace.to_s
-			raise ramf
+			raise ramfe
     end
     
 		if amfbody.special_handling == 'RemotingMessage'

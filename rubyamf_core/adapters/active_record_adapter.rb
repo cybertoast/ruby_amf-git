@@ -65,12 +65,25 @@ class ActiveRecordAdapter
     c = 0
     0.upto(num_rows - 1) do
       o = OpenStruct.new
-    
+      class << o
+        #redefine id,id= methods so that we actually get correct id's
+        def id
+          return self.idd
+        end
+        def id=(v)
+          self.idd = v
+        end
+      end
+      
       #first write the primary "attributes" on this AR object
       column_names.each_with_index do |v,k|
         k = column_names[k]
         val = um[c].send(:"#{k}")
         eval("o.#{k}=val")
+      end
+      
+      if VoUtils.getVoDefFromMappedRubyObj(um.class.to_s)
+        o = VoUtil.getVoInstanceFromMappedRubyObj(um)
       end
     
       if(associates?(um[0]))
@@ -86,7 +99,7 @@ class ActiveRecordAdapter
           end
           eval("o.#{na}=initial_data_2")
         end
-      end  
+      end
       c += 1
       initial_data << o
     end
@@ -102,6 +115,15 @@ class ActiveRecordAdapter
     c = 0
     0.upto(num_rows - 1) do
       o = OpenStruct.new
+      class << o
+        #redefine id,id= methods so that we actually get correct id's
+        def id
+          return self.idd
+        end
+        def id=(v)
+          self.idd = v
+        end
+      end
     
       #first write the primary "attributes" on this AR object
       column_names.each_with_index do |v,k|

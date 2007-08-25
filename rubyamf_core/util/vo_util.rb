@@ -18,7 +18,7 @@ class VoUtil
         eval("vo.#{member} = os.#{member}")
       end
       
-      #put _explicitType / rmembers on your VO
+      #put _explicitType / rmembers on your VO, for RubyAMF handling
       class << vo
         attr_accessor :_explicitType
         attr_accessor :rmembers
@@ -31,7 +31,7 @@ class VoUtil
     nil
   end
   
-  #populate a VO from an Object
+  #populate a VO from a generic Object
   def self.populateVoFromObject(vo,obj)
     begin
       members = obj.instance_variables.map{|mem| mem[1,mem.length]}
@@ -83,18 +83,6 @@ class VoUtil
     nil
   end
   
-  #get a VO definition from the outgoing class name
-  def self.getVoDefFromOutgoing(out)
-    mappings = vos
-    mappings.each do |map|
-      if map[:outgoing] == incom
-        return map
-      end
-    end
-    nil
-  end
-  
-  
   #get a VO from a ruby mapped VO (a transitional object the map_to key of the map hash)
   def self.getVoDefFromMappedRubyObj(classname)
     mappings = VoMappings.vos
@@ -114,7 +102,7 @@ class VoUtil
       mappings.each do |map|
         #TODO - change all this to use OpenStruct instead of VO_instance, that way the "incoming" key could be nil and not matter
         if map[:map_to] == classname
-          filepath = map[:incoming].split('.').join('/').to_s + '.rb' #set up filepath from the map_to symbol
+          filepath = map[:outgoing].split('.').join('/').to_s + '.rb' #set up filepath from the map_to symbol
           require RUBYAMF_VO + '/' + filepath #require the file
           return Object.const_get(classname.split('.').last).new #this returns an instance of the VO
         end

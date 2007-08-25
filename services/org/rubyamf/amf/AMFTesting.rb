@@ -11,18 +11,19 @@ require 'mysql'
 require 'date'
 require 'rexml/document'
 require 'ostruct'
+require 'rubyful_soup'
 include REXML
-require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/datas'
-#require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/persons'
-#require RUBYAMF_SERVICES + 'org/rubyamf/amf/vo/person'
-require RUBYAMF_HELPERS + 'fault_object'
 require RUBYAMF_CORE + 'util/net_debug'
+require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/datas'
+require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/user'
+require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/address'
+require RUBYAMF_HELPERS + 'fault_object'
 require RUBYAMF_HELPERS + 'active_record_connector'
 
 #simple data echoing tests
 class AMFTesting
   
-  #include ActiveRecordConnector
+  include ActiveRecordConnector
   
   def _authenticate(user,pass)
     #return FaultObject.new(1, 'Authentication Failed')
@@ -33,10 +34,10 @@ class AMFTesting
     #return false
     #return FaultObject.new(1, 'Authentication Failed')
     #if !@auth then return FaultObject.new(1, 'Authentication Failed') end
-    #ar_connect(RUBYAMF_SERVICES + 'org/rubyamf/amf/test.yaml')
+    ar_connect(RUBYAMF_SERVICES + 'org/rubyamf/amf/test.yaml')
   end
-
-	def debugTrace
+  
+	def netDebug
     NetDebug.Trace(nil)
     NetDebug.Trace(true)
     NetDebug.Trace(false)
@@ -58,6 +59,15 @@ class AMFTesting
 	  r = Person.new
 	  r.name = "aaron"
 	  r.phone = "789787"
+	  
+	  s = Person.new
+	  s.name = "aaron"
+	  s.phone = "789787"
+	  
+	  t = Person.new
+	  t.name = "aaron"
+	  t.phone = "789787"
+	  x = [r,s,t,myVo]
 	  return r
 	end
 	
@@ -81,6 +91,10 @@ class AMFTesting
 		false
 	end
 	
+	def getInteger
+	  Integer(1000)
+	end
+	
 	def getFixNum
 		100000
 	end
@@ -97,7 +111,6 @@ class AMFTesting
 	  #return Date.new.to_s
 	  #DBErrorLogger.Log(["MyService:",'asdfasdfasdf'])
 	  #ErrorNotifier.Send(@smtp, @to_email, @from_email,["MyService:\n",'asdfasdfasdf'])
-	  puts "GET STRING"
 	  "Yips Is Ill"
 	end
 
@@ -133,7 +146,6 @@ class AMFTesting
 	end
 	
 	def getObject
-	  puts "GET OPEN STRUCT"
 	  o = OpenStruct.new
 	  o.name = "Aaron"
 	  o.one = "Smith"
@@ -155,8 +167,8 @@ class AMFTesting
 	end
 		
 	def getXML
-		string = '<mydoc><someelement attribute="nanoo">Text, text, text</someelement></mydoc>'
-		doc = Document.new string
+		string = '<mydoc><someelement>Text, text, text</someelement></mydoc>'
+		doc = BeautifulSoup.new(string);
 		doc
 	end	
 	
@@ -165,16 +177,6 @@ class AMFTesting
 		@con.select_db("rubyamf")
     return @con.query("SELECT * FROM datas")
   end
-	
-	#get all rows in the 'datas' table
-	def arGetMultiple(o = nil)
-		return Datas.find(:all)
-	end
-	
-	#get a single ActiveRecord::Base
-	def arGetSingle(ob = nil)
-	  return Datas.find(105511)
-	end
 
 	def getPeopleVOs
     people = [ 
@@ -189,13 +191,51 @@ class AMFTesting
 
     people.each_with_index do |v,i|
       pers = Person.new
-      pers.firstName = people[i][0]
-      pers.lastName = people[i][1]
+      pers.name = people[i][0] + people[i][1]
       pers.phone = people[i][2]
-      pers.email = people[i][3]
       p << pers
     end
-
+    
     return p
 	end
+  
+  #####ACTIVE RECORD TESTS
+  def arGetEmpty
+    return Datas.new
+  end
+	
+	#get all rows in the 'datas' table
+	def arGetMultiple(o = nil)
+		return Datas.find(:all)
+	end
+	
+	#get a single ActiveRecord::Base
+	def arGetSingle(ob = nil)
+	  return Datas.find(105511)
+	end
+	
+	def getARWithAssociations
+	  #return 44
+	  puts "GET AR WITH ASSOCIATIONS"
+	  r = User.find(:all, :include => :addresses)
+	  puts r[0].id
+	  puts r[0].send(:"id")
+	  #r = User.find(:all)
+	  return r
+	end
+	
+	def receiveVOAsActiveRecord(myVO)
+	  #myVO.save
+	  puts myVO.inspect
+	end
+  
+  def voAsAR(vo)
+  end
+	
+  def arVOSave(vo)
+  end
+  
+  def arVOUpdate(vo)
+  end
+
 end
