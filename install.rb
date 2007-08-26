@@ -1,7 +1,8 @@
-#This Install script is for Rails Plugin Installation. If using the RubyAMF standalone this is not needed.
+#This Install script is for Rails Plugin Installation. If using the RubyAMF Lite this is not needed.
 begin
   require 'fileutils'
   FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/app/rubyamf_controller.rb","./app/controllers/rubyamf_controller.rb",false)
+  FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/app/default_rails_config.rb", "./config/rubyamf_config.rb", false)
   
   mime = true
   File.open("./config/environment.rb","r") do |f|
