@@ -39,7 +39,7 @@ ___________
 module ActiveRecordConnector
   def ar_connect(yml,node = "development")
     begin
-      pt = RUBYAMF_SERVICES + yaml
+      pt = RUBYAMF_SERVICES + yml
       db = ''
       File.open(pt,'r') { |f|
         db = YAML.load(f)
@@ -53,6 +53,7 @@ module ActiveRecordConnector
         :database => db[node]["database"]
       })
     rescue Exception => e
+      puts e.message
       raise e
     end
   end  
