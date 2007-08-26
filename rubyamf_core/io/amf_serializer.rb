@@ -221,15 +221,13 @@ class AMFSerializer
     elsif value.is_a?(Object)
       write_byte(AMF3_OBJECT) #write object flag
       map = VoUtil.getVoDefFromMappedRubyObj(value.class.to_s)#try to VO map against the object
-      #puts map.inspect
       if map != nil
         class << value
           attr_accessor :_explicitType
         end
         value._explicitType = map[:outgoing]
       end
-      #puts value.inspect
-      write_amf3_object(value) #write the object        
+      write_amf3_object(value) #write the object
 		end
   end
 
@@ -264,6 +262,12 @@ class AMFSerializer
   end
   
 	def write_amf3_string(value)
+	  
+	  #this is a *hack* for
+	  if value == 'amf_id'
+	    value = 'id'
+	  end
+	  
     if(value == "")
       write_byte(0x01)
     else
@@ -586,6 +590,10 @@ class AMFSerializer
 
 	# Write a Flash String object
 	def write_string(string)
+	  #this is a *hack* to get around ruby's problem with using "id" on an object
+	  if string == 'amf_id'
+	    string = 'id'
+	  end
 		write_byte(2)
 		write_utf(string.to_s)
 	end
