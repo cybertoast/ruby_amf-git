@@ -37,7 +37,7 @@ class AMFTests
     #return false
     #return FaultObject.new(1, 'Authentication Failed')
     #if !@auth then return FaultObject.new(1, 'Authentication Failed') end
-    ar_connect(RUBYAMF_SERVICES + 'org/rubyamf/amf/test.yaml')
+    #ar_connect(RUBYAMF_SERVICES + 'org/universalremoting/browser/test.yaml')
   end
   
   
@@ -195,7 +195,7 @@ class AMFTests
       ["Patrick", "Mineault", "+1234567890", "patrick@5etdemi.com"],
       ["Aaron", "Smifth", "+1234567890", "patrick@5etdemi.com"],
       ["Aaron", "Smith", "+1234567890", "patrick@5etdeffmi.com"],
-      ["Patrick", "Minffeault", "+1234567890", "patrick@5etdemi.com"] 
+      ["Patrick", "Minffeault", "+1234567890", "patrick@5etdemi.com"]
     ]
 
     p = []

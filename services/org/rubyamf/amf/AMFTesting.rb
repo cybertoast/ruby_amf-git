@@ -17,8 +17,8 @@ require RUBYAMF_CORE + 'util/net_debug'
 require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/datas'
 require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/user'
 require RUBYAMF_SERVICES + 'org/rubyamf/amf/models/address'
-require RUBYAMF_HELPERS + 'fault_object'
-require RUBYAMF_HELPERS + 'active_record_connector'
+require $RUBYAMF_HELPERS + 'fault_object'
+require $RUBYAMF_HELPERS + 'active_record_connector'
 
 #simple data echoing tests
 class AMFTesting
