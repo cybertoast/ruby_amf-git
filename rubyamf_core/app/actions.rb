@@ -2,9 +2,9 @@
 
 require 'app/request_store'
 require 'app/configuration'
-require 'util/active_record_connector'
 require 'exception/rubyamf_exception'
 require 'ostruct'
+require RUBYAMF_HELPERS + 'active_record_connector'
 include RUBYAMF::App
 include RUBYAMF::Exceptions
 include RUBYAMF::Configuration
