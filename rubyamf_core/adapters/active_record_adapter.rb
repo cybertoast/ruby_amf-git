@@ -36,16 +36,34 @@ class ActiveRecordAdapter
     false
   end
 
-  #find out if we have associates
-  def associates?(arinstance)
-    (arinstance.instance_variables.length > 1) ? true : false
-  end
-
   #get any associated data on an AR instance (from :include)
   def get_associates(arinstance)
+    keys = ['==','===','[]','[]=','abstract_class?','attr_accessible',
+    'attr_protected','attribute_names','attribute_present?','attributes',
+    'attributes=','attributes_before_type_cast','base_class','benchmark',
+    'class_of_active_record_descendant','clear_active_connections!',
+    'clear_reloadable_connections!','clone','column_for_attribute',
+    'column_names','columns','columns_hash','compute_type','connected?',
+    'connection','connection','connection=','content_columns',
+    'count_by_sql','create','decrement','decrement!','decrement_counter',
+    'delete','delete_all','destroy','destroy','destroy_all','eql?',
+    'establish_connection','exists?','find','find_by_sql','freeze','frozen?',
+    'errors','new_record_before_save','rubyamf_single_ar',
+    'has_attribute?','hash','id','id=','increment','increment!',
+    'increment_counter','inheritance_column','new','new_record?','new_record','primary_key',
+    'readonly?','reload','remove_connection','require_mysql',
+    'reset_column_information','respond_to?','sanitize_sql','sanitize_sql_array',
+    'sanitize_sql_hash','save','save!','serialize','serialized_attributes',
+    'set_inheritance_column','set_primary_key','set_sequence_name',
+    'set_table_name','silence','table_exists?','table_name','to_param',
+    'toggle','toggle!','update','update_all','update_attribute',
+    'update_attributes','update_attributes!','with_exclusive_scope','with_scope']
     finals = []
     possibles = arinstance.instance_variables.clone
     possibles.each do |k|
+      if keys.include?(k[1,k.length])
+        next
+      end
       finals << k if k != '@attributes'
     end
     finals
@@ -66,13 +84,18 @@ class ActiveRecordAdapter
     0.upto(num_rows - 1) do
       o = OpenStruct.new
       class << o
-        #redefine id,id= methods so that we actually get correct id's
         def id
-          return self.idd
+          return self.amf_id
         end
-        def id=(v)
-          self.idd = v
+        def id=(val)
+          self.amf_id = val
         end
+      end
+      
+      #turn the outgoing object into a VO if neccessary
+      map = VoUtil.getVoDefFromMappedRubyObj(um[0].class.to_s)
+      if map != nil
+        o._explicitType = map[:outgoing]
       end
       
       #first write the primary "attributes" on this AR object
@@ -82,22 +105,21 @@ class ActiveRecordAdapter
         eval("o.#{k}=val")
       end
       
-      if VoUtils.getVoDefFromMappedRubyObj(um.class.to_s)
-        o = VoUtil.getVoInstanceFromMappedRubyObj(um)
-      end
-    
-      if(associates?(um[0]))
-        associations = get_associates(um[0])
+      associations = get_associates(um[0])
+      if(!associations.empty?)
+        #associations = get_associates(um[0])
         #now write the associated models with this AR
         associations.each do |associate|
           na = associate[1, associate.length]
           ar = um[c].send(:"#{na}")
-          if(use_single?(ar))
-            initial_data_2 = run_single(ar)   #recurse into single AR method for same data structure
-          else
-            initial_data_2 = run_multiple(ar) #recurse into multiple AR method for same data structure
+          if !ar.empty? && !ar.nil?
+            if(use_single?(ar))
+              initial_data_2 = run_single(ar)   #recurse into single AR method for same data structure
+            else
+              initial_data_2 = run_multiple(ar) #recurse into multiple AR method for same data structure
+            end
+            eval("o.#{na}=initial_data_2")
           end
-          eval("o.#{na}=initial_data_2")
         end
       end
       c += 1
@@ -111,43 +133,54 @@ class ActiveRecordAdapter
     initial_data = []
     column_names = get_column_names(us)
     num_rows = 1
-  
+    
     c = 0
     0.upto(num_rows - 1) do
       o = OpenStruct.new
       class << o
-        #redefine id,id= methods so that we actually get correct id's
         def id
-          return self.idd
+          return self.amf_id
         end
-        def id=(v)
-          self.idd = v
+        def id=(val)
+          self.amf_id = val
         end
       end
-    
+
+      #turn the outgoing object into a VO if neccessary
+      map = VoUtil.getVoDefFromMappedRubyObj(us.class.to_s)
+      if map != nil
+        o._explicitType = map[:outgoing]
+      end
+      
       #first write the primary "attributes" on this AR object
       column_names.each_with_index do |v,k|
         k = column_names[k]
         val = us.send(:"#{k}")
         eval("o.#{k}=val")
       end
-    
-      if(associates?(us))
-        associations = get_associates(us)
+      
+      associations = get_associates(us)
+      if(!associations.empty?)
         #now write the associated models with this AR
         associations.each do |associate|
           na = associate[1, associate.length]
           ar = us.send(:"#{na}")
-          if(use_single?(ar))
-            initial_data_2 = run_single(ar)   #recurse into single AR method for same data structure
-          else
-            initial_data_2 = run_multiple(ar) #recurse into multiple AR method for same data structure
+          if !ar.empty? && !ar.nil?
+            if(use_single?(ar))
+              initial_data_2 = run_single(ar)   #recurse into single AR method for same data structure
+            else
+              initial_data_2 = run_multiple(ar) #recurse into multiple AR method for same data structure
+            end
+            eval("o.#{na}=initial_data_2")
           end
-          eval("o.#{na}=initial_data_2")
         end
-      end  
+      end
+      if us.single?
+        initial_data = o
+      else
+        initial_data << o
+      end
       c += 1
-      initial_data << o
     end
     initial_data
   end
