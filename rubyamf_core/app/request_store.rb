@@ -32,6 +32,8 @@ class RequestStore
   @available_services = {}
   @auth_header = nil
   @reload_services = false
+  @config_path
+  @app_instance
   
   #Rails Specific Members
   @rails_cookies
@@ -65,6 +67,8 @@ class RequestStore
 	  attr_accessor :rails_authentication
 	  attr_accessor :available_services
 	  attr_accessor :auth_header
+	  attr_accessor :config_path
+	  attr_accessor :app_instance
 	  
 	  #Rails Specific Members
 	  attr_accessor :rails_cookies
