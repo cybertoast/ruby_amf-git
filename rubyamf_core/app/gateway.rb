@@ -2,9 +2,14 @@
 
 require 'app/request_store'
 require 'app/amf'
-require 'exception/exception_handler'
 require 'app/actions'
 require 'app/filters'
+require 'app/configuration'
+require 'exception/exception_handler'
+require 'ostruct'
+require 'util/object' #Include Object stuff here.
+require 'util/openstruct' #Include Object stuff here.
+require 'util/string'
 require 'util/log'
 require 'util/net_debug'
 require 'logger'
@@ -12,6 +17,7 @@ require 'zlib'
 include RUBYAMF::Actions
 include RUBYAMF::App
 include RUBYAMF::AMF
+include RUBYAMF::Configuration
 include RUBYAMF::Filter
 include RUBYAMF::Exceptions
 include RUBYAMF::Util
@@ -31,12 +37,13 @@ class Gateway
 		RequestStore.filters_path = File.dirname(__FILE__) + '/filter/'
 		RequestStore.adapters_path = File.dirname(__FILE__) + '/../adapters/'
 		RequestStore.logs_path = File.dirname(__FILE__) + '/../logs/'
-		RequestStore.actions = Array[PrepareAction.new, ClassAction.new, InvokeAction.new, ResultAdapterAction.new] #create the actions
+		RequestStore.actions = Array[PrepareAction.new, ClassAction.new, ApplictionInstanceInitAction.new, InvokeAction.new, ResultAdapterAction.new] #create the actions
 		RequestStore.filters = Array[AMFDeserializerFilter.new, RecordsetFormatFilter.new, AuthenticationFilter.new, BatchFilter.new, nd, AMFSerializeFilter.new] #create the filter
 	end
 	
 	#all get and post requests circulate throught his method
 	def service(raw)
+	  app_config #run configuration script
 		amfobj = AMFObject.new(raw)
 		filter_chain = FilterChain.new
 		filter_chain.run(amfobj)
@@ -59,6 +66,11 @@ class Gateway
 	#turn on and off the NetDebug functionality
 	def allow_net_debug=(val)
 	  RequestStore.net_debug = val
+	end
+	
+	#set the config path
+	def config_path=(val)
+	  RequestStore.config_path = val
 	end
 	
 	def recordset_format=(val)
@@ -93,6 +105,19 @@ class Gateway
 			@log.level = Logger::FATAL
 		end
 	end
+	
+private
+	#This just requires the config file so that that configuration code runs
+	def app_config
+	  begin
+	    require RequestStore.config_path + 'rubyamf_config'
+	  rescue Exception => e
+	    STDOUT.puts "You have an error in your rubyamf_config file, please correct it."
+	    STDOUT.puts e.message
+	    STDOUT.puts e.backtrace
+	  end
+  end
+  
 end
 end
 end
