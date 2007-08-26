@@ -133,9 +133,9 @@ class ApplictionInstanceInitAction
       begin
         yamlfile = applicationInstanceDefinition[:database_config]
         if !applicationInstanceDefinition[:database_node].nil?
-          ar_connect_for_app_instance(yamlfile, applicationInstanceDefinition[:database_node])
+          ar_connect(yamlfile, applicationInstanceDefinition[:database_node])
         else
-          ar_connect_for_app_instance(yamlfile, 'default')
+          ar_connect(yamlfile, 'default')
         end
       rescue ActiveRecord::ActiveRecordError => e
         raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "ActiveRecord could not connect to the database, check that your database_config file is using the correct information.")
