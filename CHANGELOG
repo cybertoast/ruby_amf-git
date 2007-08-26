@@ -1,13 +1,31 @@
 --changes 1.3
-#added active record error handling, return an active record with errors and it sends back the first error in the errors hash as a string (EX: "login already taken")
--#-changed active records to openstructs in the active_record_adapter, to allow for custom client side class mappings
--#-handle new recursive active_record adapter in the serializer
-
-###RAILS
-#rails installer (ruby script/plugin install svn://rubyforge.org/var/svn/rubyamf/tags/current/rubyamf)
+--#added active record error handling, return an active record with errors and it sends back the first error in the errors hash as a string (EX: "login already taken")
+#rewrote rubyamf_core/adapters/active_record_adapter.rb to be recursive. Now handles VO mapping, and associated models when using :include
+#rewrote rubyamf_core/app/rails_gateway.rb. It now extends the normal gateway and just changes out the actions
+#completed VO mappings
+#added a fix in core/io/read_write.rb for a case when Rails would truncate the last \000 byte from AMF data. That was in Rails' ActionPack gem ActionController -> raw_post_data_fix.rb
+#Added @is_rubyamf to controllers.
+#added VoUtil class
+#added "single!" and "single?" helper to active record. See wiki.rubyamf.org/wiki/show/ActiveRecordSingles for more information about this
+#added util/active_record.rb. This implementes the single! method and single? method (single? is used internally to RubyAMF) See wiki.rubyamf.org/wiki/show/ActiveRecordSingles for more information about this
+#added util/openstruct.rb. #This is a fix for Object#id problems
+#added util/object.rb #this is a fix for Object#id problems
+#updated the VoUtil class for ActiveRecord VO instantiation
+#added ApplicationInitializationAction. This is used for RubyAMF lite when using AR VO's. (AR needs to be connected before incoming VO's can be turned into AR's)
+#added capability to change the rubyamf configuration file path
+#added ApplictionInstanceInitAction for configuration processing, and pre-emptive ActiveRecord connecting for ActiveRecord Value Object handling
+#added getActiveRecordFromOpenStruct, for incoming VO usage.
+#changed all mappings variables to use the new ValueObjects class in configuration.rb
+#added makeHashFromOpenStruct, used in combination with getActiveRecordFromOpenStruct.
+#changed deserializer ValueObject mapping to include the new ActiveRecord Value Object mapping functionality
+#updated the active_record_connector helper. updated so I can use it in ApplicationInitInstanceAction.
+--#thread safety
+--#re-wrote rails plugin as to not break everything when in production environment
+--#fixed lighttpd gateway, missed that in the 1.2 release
 
 --changes 1.2
 ####RAILS
+#rails installer (ruby script/plugin install svn://rubyforge.org/var/svn/rubyamf/tags/current/rubyamf)
 #support for respond_to/format.amf { render :amf => content }. You must add a mime type into railsapp/config/environment.rb (Mime::Type.register "application/x-amf", :amf)
 See the page http://wiki.rubyamf.org/wiki/show/AmfRest for more info
 #took out some puts statements
