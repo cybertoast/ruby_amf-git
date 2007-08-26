@@ -426,19 +426,29 @@ class AMFDeserializer
         		key = read_amf3_string #read next key
           end
         end
-        
-        #if type not nil and it is an OpenStruct, use VO Mapping
+
+        #Value Object
+        #if type not nil and it is an OpenStruct, check VO Mapping
     		if type != '' && ob.is_a?(OpenStruct)
-    			ob._explicitType = type
+    			ob._explicitType = type #put _explicitType for flash player typecasting
     			map = VoUtil.getVoDefFromIncoming(type)
     			if map != nil
-    			  vo = VoUtil.getVoInstanceFromIncoming(type)
-            VoUtil.populateVoFromOpenStruct(vo,ob)
+    			  if map[:type] != nil && map[:type] == 'active_record'
+    			    nvo = VoUtil.getActiveRecordFromOpenStruct(ob)
+    			    if nvo != nil
+    			      vo = nvo
+    			    else
+    			      vo = ob
+    			    end
+    			  else
+    			    vo = VoUtil.getVoInstanceFromIncoming(type)
+              VoUtil.populateVoFromOpenStruct(vo,ob)
+            end
     			  return vo #prematurly return the new VO object
     			end
         end
       end
-      return ob      
+      return ob
     end
 	end
   
