@@ -25,7 +25,7 @@ class RubyamfController < ActionController::Base
    		RequestStore.reload_services = OPTIONS[:reload]
    		
   		#create a new rubyamf gateway for processing
-  		gateway = Gateway.new
+  		gateway = RailsGateway.new
   		
   		#clear auth hash
   		RequestStore.rails_authentication = {}
@@ -36,6 +36,7 @@ class RubyamfController < ActionController::Base
   		
 		  #set the services path relative to this gateway.servlet file
   		gateway.services_path = RUBYAMF_SERVICES
+  		gateway.config_path = File.expand_path(RAILS_ROOT) + "/config/"
   		
 		  #populate the params[] hash for controller methods with the remoting parameters sent, 
 		  #(instead of passing in through the method call)
