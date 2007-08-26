@@ -1,6 +1,6 @@
-ValueObjects.register({:incoming => 'User', :map_to => 'User', :outgoing => 'User', :type => 'active_record', :instance => 'universalremoting' })
-ValueObjects.register({:incoming => 'Address', :map_to => 'Address', :outgoing => 'Address', :type => 'active_record', :instance => 'universalremoting'})
-ValueObjects.register({:incoming => 'Hasselhoff', :map_to => 'Hasselhoff', :outgoing => 'Hasselhoff', :type => 'active_record'})
+ValueObjects.register({:incoming => 'Person', :map_to => 'Person', :outgoing => 'Person', :type => 'active_record'})
+ValueObjects.register({:incoming => 'User', :map_to => 'User', :outgoing => 'User', :type => 'active_record'})
+ValueObjects.register({:incoming => 'Address', :map_to => 'Address', :outgoing => 'Address', :type => 'active_record'})
 
 Adapters.register('active_record_adapter', 'ActiveRecordAdapter')
 #Adapters.register('firebird_fireruby_adapter', 'FirebirdFirerubyAdapter')
