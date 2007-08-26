@@ -1,13 +1,13 @@
 #Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 
-require 'adapter_settings'
 require 'app/request_store'
+require 'app/configuration'
+require 'util/active_record_connector'
 require 'exception/rubyamf_exception'
 require 'ostruct'
-require 'util/string_util'
 include RUBYAMF::App
 include RUBYAMF::Exceptions
-
+include RUBYAMF::Configuration
 module RUBYAMF
 module Actions
 
@@ -86,6 +86,90 @@ class ClassAction
 		  $:.shift #clear the service path that was put into the load path array
 	  end
 	end
+end
+
+#This takes an AMFBody and initializes the Application::Instance that was registered for the target service (org.rubyamf.amf.AMFTesting)
+class ApplictionInstanceInitAction
+  include ActiveRecordConnector #include the connector
+  def run(amfbody)
+    #get the application instance definition
+    applicationInstanceDefinition = Application::Instance.getAppInstanceDefFromTargetService(amfbody.target_uri)
+    if applicationInstanceDefinition.nil?
+      return nil
+    end
+    
+    #store the app instnace definition
+    RequestStore.app_instance = applicationInstanceDefinition
+    
+    #Now get VO's and if any of them use 'active_record' as the type, require active_record
+    vos = ValueObjects.get_vos_by_instance(applicationInstanceDefinition[:name].to_s)
+    if vos == nil || vos.empty? then return nil end
+    
+    should_connect = false
+    require_models = false
+    
+    vos.each do |vo|
+      if vo[:type] != nil
+        if vo[:type] == 'active_record'
+          begin
+            should_connect = true
+            require_models = true if !applicationInstanceDefinition[:models_path].nil?
+            require 'rubygems'
+            require 'active_record'
+            $:.unshift(RUBYAMF_CORE) #ensure the rubyamf_core load path is still first
+            require 'util/active_record'
+            break
+          rescue LoadError => e
+            raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "You have a Value Object defined that use ActiveRecord, but the ActiveRecord gem is not installed.")
+            break
+          end
+        end
+      end
+    end
+    
+    connected = false
+    #connect ActiveRecord if needed
+    if should_connect
+      begin
+        yamlfile = applicationInstanceDefinition[:database_config]
+        if !applicationInstanceDefinition[:database_node].nil?
+          ar_connect_for_app_instance(yamlfile, applicationInstanceDefinition[:database_node])
+        else
+          ar_connect_for_app_instance(yamlfile, 'default')
+        end
+      rescue ActiveRecord::ActiveRecordError => e
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "ActiveRecord could not connect to the database, check that your database_config file is using the correct information.")
+      rescue Exception => e
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while connecting your applications ActiveRecord definition")
+      end
+      connected = true
+    end
+    
+    #if we get past the block above somehow but didn't connect
+    if connected == false && require_models
+      if applicationInstanceDefinition[:database_config]
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while instantiating your application instance. You specified that you want to require Active Record models, but ActiveRecord could not connect propertly, double check your database configuration yaml file.")
+      elsif applicationInstanceDefinition[:database_config].nil?
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while instantiating your application instance. You specified that you want to require Active Record models, but you did not specify a database_config file, see the default 'rubyamf_config.rb' file in services for an example.")
+      end
+    end
+    
+    #require all the user models if needed
+    if require_models && connected
+      models_path = applicationInstanceDefinition[:models_path]
+      files = Dir.glob(RUBYAMF_SERVICES + models_path)
+      if files.empty? then return nil end
+      begin
+        $:.unshift(RUBYAMF_SERVICES)
+        files.each do |file|
+          require file
+        end
+        $:.shift
+      rescue LoadError => e
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while loading your application models, please review your application instnace configuration for {#{applicationInstanceDefinition[:name]}}")
+      end
+    end
+  end
 end
 
 #Invoke a service call on the loaded class (loads the class in the class_action)
@@ -280,7 +364,7 @@ end
 
 #this class takes the amfobj's results (if a db result) and adapts it to a flash recordset
 class ResultAdapterAction
-  include Adapters #include the module that defines what adapters to test for
+  #include Adapters #include the module that defines what adapters to test for
   
 	def run(amfbody)
     new_results = '' #for some reason this has to be initialized here.. not sure why
@@ -291,6 +375,7 @@ class ResultAdapterAction
 		end
     
     begin
+      adapters = Adapters.get_adapters
       if adapters.class.to_s == "Array"
         if adapters.empty?
           new_results = results
