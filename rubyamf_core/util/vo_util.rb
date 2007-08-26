@@ -1,7 +1,6 @@
 #Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 
 #utility method to get a vo object mapping from the vo_mappings module
-#require 'vo_mappings'
 require 'app/configuration'
 require 'app/request_store'
 require 'exception/rubyamf_exception'
@@ -65,7 +64,12 @@ class VoUtil
       if key == '_explicitType' || key == 'rmembers'
         next
       end
-      hash[key] = os.send(:"#{key}")
+      val = os.send(:"#{key}")
+      if val == nil || val == 'NaN' || val == 'undefined'
+        hash[key] = []
+      else
+        hash[key] = val
+      end
     end
     hash
   end
@@ -85,6 +89,7 @@ class VoUtil
   def self.getVoInstanceFromIncoming(incom)
     begin
       mappings = ValueObjects.get_vo_mappings
+      puts mappings.inspect
       mappings.each do |map|
         if map[:incoming] == incom
           filepath = map[:map_to].split('.').join('/').to_s + '.rb' #set up filepath from the map_to symbol
@@ -101,6 +106,7 @@ class VoUtil
   #get a VO from a ruby mapped VO (a transitional object the map_to key of the map hash)
   def self.getVoDefFromMappedRubyObj(classname)
     mappings = ValueObjects.get_vo_mappings
+    puts mappings.inspect
     m = '' #TODO - Fix me, why do I need to initialize m here ??
     mappings.each do |map|
       if map[:map_to] == classname
@@ -115,6 +121,7 @@ class VoUtil
   def self.getVoInstanceFromMappedRubyObj(classname)
     begin
       mappings = ValueObjects.get_vo_mappings
+      puts mappings.inspect
       mappings.each do |map|
         if map[:map_to] == classname
           filepath = map[:outgoing].split('.').join('/').to_s + '.rb' #set up filepath from the map_to symbol
