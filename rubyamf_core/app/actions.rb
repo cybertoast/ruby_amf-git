@@ -102,7 +102,7 @@ class ApplictionInstanceInitAction
     RequestStore.app_instance = applicationInstanceDefinition
     
     #Now get VO's and if any of them use 'active_record' as the type, require active_record
-    vos = ValueObjects.get_vos_by_instance(applicationInstanceDefinition[:name].to_s)
+    vos = ValueObjects.get_vo_mappings
     if vos == nil || vos.empty? then return nil end
     
     should_connect = false
@@ -166,7 +166,10 @@ class ApplictionInstanceInitAction
         end
         $:.shift
       rescue LoadError => e
-        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while loading your application models, please review your application instnace configuration for {#{applicationInstanceDefinition[:name]}}")
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while loading your application models {#{e.message}}")
+      rescue TypeError => e #incorrect superclass error supression
+        if e.message =~ /superclass mismatch/
+        end
       end
     end
   end

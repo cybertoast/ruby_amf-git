@@ -1,22 +1,13 @@
 #Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
-#Simple Person class for VO Testing
-class Person
-  attr_accessor :name
-  attr_accessor :phone
-end
-
-require 'rubygems'
-require 'active_record'
 require 'mysql'
 require 'date'
 require 'ostruct'
 require 'rubyful_soup'
-
 require RUBYAMF_CORE + 'util/net_debug'
 require RUBYAMF_HELPERS + 'fault_object'
-require RUBYAMF_HELPERS + 'active_record_connector'
-require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/ar_models/datas'
+
+#require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/ar_models/datas'
+require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/vo/person'
 
 #this class implements the universal remoting browser tests that are bundled with the application
 class AMFTests
@@ -25,8 +16,6 @@ class AMFTests
   def ping
     true
   end
-  
-  include ActiveRecordConnector
   
   def _authenticate(user,pass)
     #return FaultObject.new(1, 'Authentication Failed')
@@ -173,9 +162,13 @@ class AMFTests
 	
 	#mysql recordset
   def getMysqlResult
+    puts "GET MYSQL RESULT"
 	  @con = Mysql.connect("localhost","root","")
 		@con.select_db("rubyamf")
-    return @con.query("SELECT * FROM datas")
+		d = @con.query("SELECT * FROM datas")
+		puts d.inspect
+		puts d.num_rows
+    return d
   end
 	
   #AR result set
@@ -211,9 +204,59 @@ class AMFTests
 	end
 	
 	
+	
+	
 	#################OTHER
+	
+	def receivePersonARVO(vo)
+	  puts "RECEIVE PERSON VO"
+    person = vo
+    puts person.inspect
+    person.save
+    true
+  end
+    
+  def getARWithAssociations
+    u = User.find(:all, :include => :addresses)
+    return u
+  end
+  
+  def getNewUser
+    u = User.new
+    u.firstname = "aaron"
+    u.lastname = "smith"
+    u.addresses = []
+    u.single! #Tell RubyAMF to send a single object, not an array with one object.... ( SENDS: {}, NOT [{}] )
+    #u.save #Purposefully not saving here..
+    return u
+  end
+  
+  def receiveUserVOWithEmbeddedAssociations(vo)
+    user = vo
+    #addresses come in user.addresses
+    user.save
+    puts user.inspect
+    true
+  end
+  
+  def receiveUserVOWithEmptyAssociations(vo)
+    user = vo
+    user.save
+    puts user.inspect
+    true
+  end
+  
+  def receiveUserVOWithNilAssociations(vo)
+    user = vo
+    user.save
+    puts user.inspect
+    true
+  end
+	
 	def voPassThrough(myVo = nil)
-	  #puts myVo.inspect
+	  puts "MYVO"
+	  puts myVo.inspect
+	  
 	  #return myVo
 	  r = Person.new
 	  r.name = "aaron"
@@ -228,7 +271,7 @@ class AMFTests
 	  t.phone = "789787"
 	  x = [r,s,t,myVo]
 	  puts x.inspect
-	  return r
+	  return myVo
 	end
 	
 	def testSession

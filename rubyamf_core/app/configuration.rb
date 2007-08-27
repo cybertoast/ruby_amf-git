@@ -5,6 +5,7 @@
 module RUBYAMF
 module Configuration
 
+#Application::Instance support class
 class Application
   
   module Instance
@@ -47,6 +48,7 @@ class Application
   end
 end
 
+#Global adapters configuration support class
 class Adapters
   @@adpters = []
   def Adapters.register(file,classname)
@@ -58,11 +60,13 @@ class Adapters
   end
 end
 
+#ValueObjects configuration support class
 class ValueObjects
   
   @@vo_mappings = []
   @@vo_by_instances_lookup = {}
   
+  #register a value object map
   def ValueObjects.register(hash)
     if hash[:instance] != nil
       if @@vo_by_instances_lookup[hash[:instance]].nil?
@@ -74,20 +78,30 @@ class ValueObjects
     end
   end
   
+  #Get ValueObject mappings for this request
   def ValueObjects.get_vo_mappings
-    return @@vo_mappings
-  end
-  
-  def ValueObjects.get_vos_by_instance(instance)
     maps = []
-    maps.concat(@@vo_mappings) #append all GLOBAL VO's to this array
-    if !@@vo_by_instances_lookup.empty?
-      if @@vo_by_instances_lookup[instance] != nil
-        maps.concat(@@vo_by_instances_lookup[instance])
-        return maps
+    #If no application instance has been defined for this request, just return all ValueObjects
+    if RequestStore.app_instance == nil
+      if !@@vo_mappings.empty? #if some global value objects are available, put them in the maps array
+        maps.concat(@@vo_mappings)
+      end
+      return maps
+    else
+      instance = RequestStore.app_instance[:name]
+      #puts instance specific VO's into the maps array
+      if !@@vo_by_instances_lookup.empty?
+        if @@vo_by_instances_lookup[instance] != nil
+          maps.concat(@@vo_by_instances_lookup[instance])
+        end
+      end
+      
+      #now put non app specific ValueObjects into maps array
+      if !@@vo_mappings.empty?
+        maps.concat(@@vo_mappings)
       end
     end
-    nil
+    maps
   end
 end
 

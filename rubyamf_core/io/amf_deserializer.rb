@@ -429,23 +429,12 @@ class AMFDeserializer
 
         #Value Object
         #if type not nil and it is an OpenStruct, check VO Mapping
-    		if type != '' && ob.is_a?(OpenStruct)
-    			ob._explicitType = type #put _explicitType for flash player typecasting
-    			map = VoUtil.getVoDefFromIncoming(type)
-    			if map != nil
-    			  if map[:type] != nil && map[:type] == 'active_record'
-    			    nvo = VoUtil.getActiveRecordFromOpenStruct(ob)
-    			    if nvo != nil
-    			      vo = nvo
-    			    else
-    			      vo = ob
-    			    end
-    			  else
-    			    vo = VoUtil.getVoInstanceFromIncoming(type)
-              VoUtil.populateVoFromOpenStruct(vo,ob)
-            end
-    			  return vo #prematurly return the new VO object
-    			end
+    		if type != nil && ob.is_a?(OpenStruct)
+          ob._explicitType = type #assign the _explictType right away, however if this is a valid VO, it get's changed in VoUtil
+          vo = VoUtil.get_vo_for_incoming(ob, type)
+          if vo != nil
+            return vo
+          end
         end
       end
       return ob

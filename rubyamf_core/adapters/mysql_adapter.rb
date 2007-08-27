@@ -19,6 +19,8 @@ class MysqlAdapter
 	#run the action on an AMFBody#result instance var
 	def run(result)
 		
+		puts "RUN MYSQL ADAPTER"
+		
 		column_names = Array.new #store the column names
 		fields = result.fetch_fields #get all the fields
 		fields.each do |field|
@@ -35,6 +37,7 @@ class MysqlAdapter
 				
 		asrecordset = ASRecordset.new(row_count,column_names,initial_data)
 		result = asrecordset
+		puts result.inspect
 		return result
 	end
 end

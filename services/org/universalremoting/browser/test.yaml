@@ -3,4 +3,4 @@ development:
   username: "root"
   password: ""
   adapter: "mysql"
-  database: "rubyamf"
+  database: "ar_rubyamf_testings"

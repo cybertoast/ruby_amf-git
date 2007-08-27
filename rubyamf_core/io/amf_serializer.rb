@@ -219,15 +219,9 @@ class AMFSerializer
       write_amf3_xml(value)
     
     elsif value.is_a?(Object)
-      write_byte(AMF3_OBJECT) #write object flag
-      map = VoUtil.getVoDefFromMappedRubyObj(value.class.to_s)#try to VO map against the object
-      if map != nil
-        class << value
-          attr_accessor :_explicitType
-        end
-        value._explicitType = map[:outgoing]
-      end
-      write_amf3_object(value) #write the object
+      write_byte(AMF3_OBJECT)
+      vo = VoUtil.get_vo_for_outgoing(value)
+      write_amf3_object(vo)
 		end
   end
 
