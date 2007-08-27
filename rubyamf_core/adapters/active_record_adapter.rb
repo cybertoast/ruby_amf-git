@@ -93,7 +93,7 @@ class ActiveRecordAdapter
       end
       
       #turn the outgoing object into a VO if neccessary
-      map = VoUtil.getVoDefFromMappedRubyObj(um[0].class.to_s)
+      map = VoUtil.get_vo_definition_from_active_record(um[0].class.to_s)
       if map != nil
         o._explicitType = map[:outgoing]
       end
@@ -147,7 +147,7 @@ class ActiveRecordAdapter
       end
 
       #turn the outgoing object into a VO if neccessary
-      map = VoUtil.getVoDefFromMappedRubyObj(us.class.to_s)
+      map = VoUtil.get_vo_definition_from_active_record(us.class.to_s)
       if map != nil
         o._explicitType = map[:outgoing]
       end

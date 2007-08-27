@@ -85,6 +85,16 @@ class VoUtil
     end
   end
   
+  #get a mapping from an active record instance, used in active record adapter
+  def self.get_vo_definition_from_active_record(classname)
+    mappings = ValueObjects.get_vo_mappings
+    mappings.each do |map|
+      if map[:map_to] == classname
+        return map
+      end
+    end
+  end
+  
   #make an init hash for AR from an open struct
   def self.make_hash_for_active_record_from_open_struct(os)
     hash = {}
@@ -109,7 +119,7 @@ class VoUtil
       return nil
     end
     classname = os._explicitType
-    hash = self.makeHashForActiveRecordFromOpenStruct(os)
+    hash = self.make_hash_for_active_record_from_open_struct(os)
     ar = Object.const_get(classname).new(hash)
     return ar
   end
