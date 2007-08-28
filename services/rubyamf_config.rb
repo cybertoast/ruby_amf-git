@@ -43,6 +43,7 @@
 #APPLICATION INSTANCE DEFINITIONS HERE
 Application::Instance.register({
   :name => 'universalremoting',
+  :initialize => 'active_record',
   :source => 'org.universalremoting.browser.*',
   :database_config => 'org/universalremoting/browser/test.yaml',
   :database_node => 'development',
@@ -85,9 +86,9 @@ ValueObjects.register({:incoming => 'User', :map_to => 'User', :outgoing => 'Use
 ValueObjects.register({:incoming => 'Address', :map_to => 'Address', :outgoing => 'Address', :type => 'active_record', :instance => 'universalremoting'})
 
 #GLOBAL VALUE OBJECTS HERE
-ValueObjects.register({:incoming => 'Person', :map_to => 'org.universalremoting.browser.support.vo.person', :outgoing => 'Person' })
-ValueObjects.register({:incoming => 'Person2', :map_to => 'org.universalremoting.browser.support.vo.person2', :outgoing => 'Person2' })
-ValueObjects.register({:incoming => '', :map_to => 'Person', :outgoing => 'Person' })
+#ValueObjects.register({:incoming => 'Person', :map_to => 'org.universalremoting.browser.support.vo.person', :outgoing => 'Person' })
+#ValueObjects.register({:incoming => 'Person2', :map_to => 'org.universalremoting.browser.support.vo.person2', :outgoing => 'Person2' })
+#ValueObjects.register({:incoming => '', :map_to => 'Person', :outgoing => 'Person' })
 
 
 

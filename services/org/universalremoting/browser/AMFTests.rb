@@ -6,8 +6,8 @@ require 'rubyful_soup'
 require RUBYAMF_CORE + 'util/net_debug'
 require RUBYAMF_HELPERS + 'fault_object'
 
-#require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/ar_models/datas'
-require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/vo/person'
+require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/ar_models/datas'
+#require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/vo/person'
 
 #this class implements the universal remoting browser tests that are bundled with the application
 class AMFTests
@@ -209,9 +209,9 @@ class AMFTests
 	#################OTHER
 	
 	def receivePersonARVO(vo)
-	  puts "RECEIVE PERSON VO"
+	  #puts "RECEIVE PERSON VO"
     person = vo
-    puts person.inspect
+    #puts person.inspect
     person.save
     true
   end
@@ -226,36 +226,36 @@ class AMFTests
     u.firstname = "aaron"
     u.lastname = "smith"
     u.addresses = []
-    u.single! #Tell RubyAMF to send a single object, not an array with one object.... ( SENDS: {}, NOT [{}] )
+    #u.single! #Tell RubyAMF to send a single object, not an array with one object.... ( SENDS: {}, NOT [{}] )
     #u.save #Purposefully not saving here..
-    return u
+    return u.as_single!
   end
   
   def receiveUserVOWithEmbeddedAssociations(vo)
     user = vo
     #addresses come in user.addresses
     user.save
-    puts user.inspect
+    #puts user.inspect
     true
   end
   
   def receiveUserVOWithEmptyAssociations(vo)
     user = vo
     user.save
-    puts user.inspect
+    #puts user.inspect
     true
   end
   
   def receiveUserVOWithNilAssociations(vo)
     user = vo
     user.save
-    puts user.inspect
+    #puts user.inspect
     true
   end
 	
 	def voPassThrough(myVo = nil)
-	  puts "MYVO"
-	  puts myVo.inspect
+	  #puts "MYVO"
+	  #puts myVo.inspect
 	  
 	  #return myVo
 	  r = Person.new
