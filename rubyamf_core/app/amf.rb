@@ -305,14 +305,26 @@ class ASFault < OpenStruct
 				
 		backtrace = e.backtrace || e.ebacktrace #grab the correct backtrace
 		
-		linerx = /:(\d*):/
-		line = linerx.match(backtrace[0])[1] #get the numbers
+		begin
+		  linerx = /:(\d*):/
+  		line = linerx.match(backtrace[0])[1] #get the numbers
+		rescue Exception => e
+	    line = 'No backtrace was found in this exception'
+	  end
+	  
+	  begin
+		  methodrx = /`(\S*)\'/
+  		method = methodrx.match(backtrace[0])[1] #just method name
+		rescue Exception => e
+		  method = "No method was found in this exception"
+		end
 		
-		methodrx = /`(\S*)\'/
-		method = methodrx.match(backtrace[0])[1] #just method name
-		
-		classrx = /([a-zA-Z0-9_]*)\.rb/
-		classm = classrx.match(backtrace[0]) #class name
+		begin
+  		classrx = /([a-zA-Z0-9_]*)\.rb/
+  		classm = classrx.match(backtrace[0]) #class name
+	  rescue Exception => e
+	    classm = "No class was found in this exception"
+	  end
 		
 		self.code = e.etype.to_s
 		self.description = e.message
@@ -336,14 +348,26 @@ class AS3Fault < OpenStruct
 		
 		backtrace = e.backtrace || e.ebacktrace #grab the correct backtrace
 		
-		linerx = /:(\d*):/
-		line = linerx.match(backtrace[0])[1] #get the numbers
+		begin
+		  linerx = /:(\d*):/
+  		line = linerx.match(backtrace[0])[1] #get the numbers
+		rescue Exception => e
+	    line = 'No backtrace was found in this exception'
+	  end
+	  
+	  begin
+		  methodrx = /`(\S*)\'/
+  		method = methodrx.match(backtrace[0])[1] #just method name
+		rescue Exception => e
+		  method = "No method was found in this exception"
+		end
 		
-		methodrx = /`(\S*)\'/
-		method = methodrx.match(backtrace[0])[1] #just method name
-		
-		classrx = /([a-zA-Z0-9_]*)\.rb/
-		classm = classrx.match(backtrace[0]) #class name
+		begin
+  		classrx = /([a-zA-Z0-9_]*)\.rb/
+  		classm = classrx.match(backtrace[0]) #class name
+	  rescue Exception => e
+	    classm = "No class was found in this exception"
+	  end
 		
     self._explicitType = 'flex.messaging.messages.ErrorMessage'
 		self.faultCode = e.etype.to_s
