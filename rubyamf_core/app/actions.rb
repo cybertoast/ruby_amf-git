@@ -91,7 +91,7 @@ end
 #This takes an AMFBody and initializes the Application::Instance that was registered for the target service (org.rubyamf.amf.AMFTesting)
 class ApplictionInstanceInitAction
   include ActiveRecordConnector #include the connector
-  def run(amfbody)
+  def run(amfbody)    
     #get the application instance definition
     applicationInstanceDefinition = Application::Instance.getAppInstanceDefFromTargetService(amfbody.target_uri)
     if applicationInstanceDefinition.nil?
@@ -100,33 +100,23 @@ class ApplictionInstanceInitAction
     
     #store the app instnace definition
     RequestStore.app_instance = applicationInstanceDefinition
-    
-    #Now get VO's and if any of them use 'active_record' as the type, require active_record
-    vos = ValueObjects.get_vo_mappings
-    if vos == nil || vos.empty? then return nil end
-    
+        
     should_connect = false
     require_models = false
     
-    vos.each do |vo|
-      if vo[:type] != nil
-        if vo[:type] == 'active_record'
-          begin
-            should_connect = true
-            require_models = true if !applicationInstanceDefinition[:models_path].nil?
-            require 'rubygems'
-            require 'active_record'
-            $:.unshift(RUBYAMF_CORE) #ensure the rubyamf_core load path is still first
-            require 'util/active_record'
-            break
-          rescue LoadError => e
-            raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "You have a Value Object defined that use ActiveRecord, but the ActiveRecord gem is not installed.")
-            break
-          end
-        end
+    if applicationInstanceDefinition[:initialize] == 'active_record'
+      begin
+        should_connect = true
+        require_models = true if !applicationInstanceDefinition[:models_path].nil?
+        require 'rubygems'
+        require 'active_record'
+        $:.unshift(RUBYAMF_CORE) #ensure the rubyamf_core load path is still first
+        require 'util/active_record'
+      rescue LoadError => e
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "You have a Value Object defined that use ActiveRecord, but the ActiveRecord gem is not installed.")
       end
     end
-    
+      
     connected = false
     #connect ActiveRecord if needed
     if should_connect
@@ -169,7 +159,10 @@ class ApplictionInstanceInitAction
         raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while loading your application models {#{e.message}}")
       rescue TypeError => e #incorrect superclass error supression
         if e.message =~ /superclass mismatch/
+          raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured when loading your models, Your service is requiring another class of the same type of one of your models.")
         end
+      rescue Exception => e
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while loading your models. #{e.message}")
       end
     end
   end
