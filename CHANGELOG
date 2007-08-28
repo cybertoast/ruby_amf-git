@@ -1,5 +1,4 @@
---changes 1.3
---#added active record error handling, return an active record with errors and it sends back the first error in the errors hash as a string (EX: "login already taken")
+--changes 1.3 RC1
 #rewrote rubyamf_core/adapters/active_record_adapter.rb to be recursive. Now handles VO mapping, and associated models when using :include
 #rewrote rubyamf_core/app/rails_gateway.rb. It now extends the normal gateway and just changes out the actions
 #completed VO mappings
@@ -19,6 +18,8 @@
 #added makeHashFromOpenStruct, used in combination with getActiveRecordFromOpenStruct.
 #changed deserializer ValueObject mapping to include the new ActiveRecord Value Object mapping functionality
 #updated the active_record_connector helper. updated so I can use it in ApplicationInitInstanceAction.
+#rails installer now copies rubyamf_core/app/default_rails_config into rails/config/rubyamf_config.rb.
+--#added active record error handling, return an active record with errors and it sends back the first error in the errors hash as a string (EX: "login already taken")
 --#thread safety
 --#re-wrote rails plugin as to not break everything when in production environment
 --#fixed lighttpd gateway, missed that in the 1.2 release
