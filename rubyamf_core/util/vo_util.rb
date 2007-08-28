@@ -93,6 +93,7 @@ class VoUtil
         return map
       end
     end
+    nil
   end
   
   #make an init hash for AR from an open struct
