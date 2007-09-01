@@ -7,7 +7,7 @@ class ActionController::Base
   attr_accessor :used_render_amf
   attr_accessor :amf_content
   attr_accessor :rubyamf_attempt_file_render
-=begin
+
   def render(options = nil, deprecated_status = nil, &block) #:doc:    
     raise DoubleRenderError, "Can only render or redirect once per action" if performed?
     if options.nil?
@@ -92,5 +92,4 @@ class ActionController::Base
       end
     end
   end
-=end
 end
