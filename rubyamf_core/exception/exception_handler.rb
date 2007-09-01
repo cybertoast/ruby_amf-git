@@ -13,7 +13,7 @@ class ExceptionHandler
 	def ExceptionHandler.HandleException(e, body)
 		if RequestStore.amf_encoding == 'amf3'
       body.results = AS3Fault.new(e)
-      #trigger RemoteObject failure
+      #trigger RemoteObject failure for AsyncTokens
       if body.special_handling == "RemotingMessage"
         body.results.correlationId = body.get_meta('messageId')
         body.results.clientId = body.get_meta('clientId') || body.results.correlationId

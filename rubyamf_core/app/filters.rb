@@ -67,16 +67,10 @@ class BatchFilter
 				begin #this is where any exception throughout the RubyAMF Process gets transformed into a relevant AMF0/AMF3 faultObject
 					action.run(body)
 				rescue RUBYAMFException => ramfe
-				  puts "CAUGHT EXCEPTION"
-				  puts ramfe.message
-				  puts ramfe.backtrace
 				  ramfe.ebacktrace = ramfe.backtrace.to_s
 					ExceptionHandler::HandleException(ramfe,body)
 					return
 				rescue Exception => e
-				  puts "CAUGHT EXCEPT"
-				  puts e.message
-				  puts e.backtrace
 					ramfe = RUBYAMFException.new(e.class.to_s, e.message.to_s) #translate the exception into a rubyamf exception
 					ramfe.ebacktrace = e.backtrace.to_s
 					ExceptionHandler::HandleException(ramfe, body)
