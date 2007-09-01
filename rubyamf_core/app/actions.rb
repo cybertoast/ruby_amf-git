@@ -322,6 +322,7 @@ class RailsInvokeAction
 		req.env['PATH_INFO'] = "#{ct}/#{sm}"
 		req.env['REQUEST_PATH'] = "#{ct}/#{sm}"
 		req.env['REQUEST_URI'] = "#{ct}/#{sm}"
+		req.env['HTTP_ACCEPT'] = 'application/x-amf,' + req.env['HTTP_ACCEPT'].to_s
 		
 		@service.is_amf = true
 		@service.is_rubyamf = true

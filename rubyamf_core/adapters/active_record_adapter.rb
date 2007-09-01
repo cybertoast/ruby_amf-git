@@ -93,11 +93,9 @@ class ActiveRecordAdapter
       end
       
       #turn the outgoing object into a VO if neccessary
-      if !TESTING
-        map = VoUtil.get_vo_definition_from_active_record(um[0].class.to_s)
-        if map != nil
-          o._explicitType = map[:outgoing]
-        end
+      map = VoUtil.get_vo_definition_from_active_record(um[0].class.to_s)
+      if map != nil
+        o._explicitType = map[:outgoing]
       end
       
       #first write the primary "attributes" on this AR object
@@ -149,11 +147,9 @@ class ActiveRecordAdapter
       end
 
       #turn the outgoing object into a VO if neccessary
-      if !TESTING
-        map = VoUtil.get_vo_definition_from_active_record(us.class.to_s)
-        if map != nil
-          o._explicitType = map[:outgoing]
-        end
+      map = VoUtil.get_vo_definition_from_active_record(us.class.to_s)
+      if map != nil
+        o._explicitType = map[:outgoing]
       end
       
       #first write the primary "attributes" on this AR object

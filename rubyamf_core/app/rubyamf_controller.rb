@@ -75,23 +75,9 @@ class RubyamfController < ActionController::Base
 		    amf_response = gateway.service(request.env["RAW_POST_DATA"])
   		  headers['Content-Type'] = "application/x-amf"
   		end
-  		
-  		#ActiveRecord::Base.class_eval do
-      #  alias :repond_to :respond_to_old
-      #end
-  		
-  		#puts amf_response
-  		puts "GOING TO RENDER FINAL"
-  		
+  		  		
       #render the AMF
-      begin
-        render :text => amf_response
-      rescue Exception => e
-        puts "FUCKKKKKKKKKKKKKKKKKKKKK"
-        puts e.message
-      end
-      
-  		#render :text => proc { |response, output| output.write(amf_response) }
+      render :text => amf_response
 	  rescue Exception => e #only errors in this scope will ever be rescued here, see BatchFiler
       STDOUT.puts e.to_s
 	    STDOUT.puts e.backtrace
