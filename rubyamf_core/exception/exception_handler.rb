@@ -14,10 +14,10 @@ class ExceptionHandler
 		if RequestStore.amf_encoding == 'amf3'
       body.results = AS3Fault.new(e)
       #trigger RemoteObject failure
-      #if body.special_handling == "RemotingMessage"
-      #  body.results.correlationId = body.get_meta('messageId')
-      #  body.results.clientId = body.get_meta('clientId') || body.results.correlationId
-      #end
+      if body.special_handling == "RemotingMessage"
+        body.results.correlationId = body.get_meta('messageId')
+        body.results.clientId = body.get_meta('clientId') || body.results.correlationId
+      end
     else
       body.fail! #force the fail trigger for F8, this causes it to map to the onFault handler
       body.results = ASFault.new(e)
