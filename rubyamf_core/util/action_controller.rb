@@ -1,5 +1,5 @@
-#this defines a run_target_with_filters method on ActionController::Base,
-#it will run before filters, the target method, then the after methods in order
+#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
+#This class extends ActionController::Base
 class ActionController::Base
   
   attr_accessor :is_amf
@@ -7,9 +7,8 @@ class ActionController::Base
   attr_accessor :used_render_amf
   attr_accessor :amf_content
   attr_accessor :rubyamf_attempt_file_render
-
+=begin
   def render(options = nil, deprecated_status = nil, &block) #:doc:    
-    #puts block
     raise DoubleRenderError, "Can only render or redirect once per action" if performed?
     if options.nil?
       if self.rubyamf_attempt_file_render
@@ -93,4 +92,5 @@ class ActionController::Base
       end
     end
   end
+=end
 end
