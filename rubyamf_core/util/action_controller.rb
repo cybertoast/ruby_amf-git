@@ -39,10 +39,6 @@ class ActionController::Base
     if text = options[:text]
       render_text(text, options[:status])
 
-    elsif amf = options[:amf]
-      self.used_render_amf = true
-      self.amf_content = amf
-
     else
       if file = options[:file]
         render_file(file, options[:status], options[:use_full_path], options[:locals] || {})
