@@ -45,7 +45,7 @@ class PrepareAction
         amfbody.set_amf0_service_and_method
       end
     elsif RequestStore.amf_encoding == 'amf0' #AMF0
-      amfbody.set_amf0_class_file_and_uri 
+      amfbody.set_amf0_class_file_and_uri
       amfbody.set_amf0_service_and_method
     end    
   end    
@@ -122,15 +122,18 @@ class ApplictionInstanceInitAction
     if should_connect
       begin
         yamlfile = applicationInstanceDefinition[:database_config]
+        if yamlfile.nil?
+          raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "You must specify the :database_config option in your Application Instance Definition (in rubyamf_config). In order for ActiveRecord to connect properly.")
+        end
         if !applicationInstanceDefinition[:database_node].nil?
           ar_connect(yamlfile, applicationInstanceDefinition[:database_node])
         else
           ar_connect(yamlfile, 'default')
         end
       rescue ActiveRecord::ActiveRecordError => e
-        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "ActiveRecord could not connect to the database, check that your database_config file is using the correct information.")
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "ActiveRecord could not connect to the database, check that your database_config file is using the correct information. {#{e.message}}")
       rescue Exception => e
-        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while connecting your applications ActiveRecord definition")
+        raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while connecting your applications ActiveRecord definition {#{e.message}}")
       end
       connected = true
     end
@@ -159,7 +162,7 @@ class ApplictionInstanceInitAction
         raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while loading your application models {#{e.message}}")
       rescue TypeError => e #incorrect superclass error supression
         if e.message =~ /superclass mismatch/
-          raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured when loading your models, Your service is requiring another class of the same type of one of your models.")
+          raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured when loading your application models, Your service is requiring another class of the same type of one of your models.")
         end
       rescue Exception => e
         raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "An error occured while loading your models. #{e.message}")
@@ -218,7 +221,7 @@ class InvokeAction
 	    begin
 	      res = @service.send('before_filter')
   	    if res == false #catch false
-  	      raise RUBYAMFException.new(RUBYAMFException.FILTER_CHAIN_HAULTED, "before_filter haulted by returning false")
+  	      raise RUBYAMFException.new(RUBYAMFException.FILTER_CHAIN_HAULTED, "before_filter haulted by returning false.")
   	    elsif res.class.to_s == 'FaultObject' #catch returned FaultObjects
   	      raise RUBYAMFException.new(res.code, res.message)
   	    end
@@ -244,7 +247,7 @@ class InvokeAction
 				args = @amfbody.value
 				@service_result = @service.send(@amfbody.service_method_name, *args) #* splat the argument values to pass correctly to the service method
 			end
-		rescue Exception => e #catch any method call errors, transform into RUBYAMFErrors so that they propogate back to flash correctly
+		rescue Exception => e #catch any method call errors, transform into RUBYAMFException so that they propogate back to flash correctly
 			if e.message == "exception class/object expected"
   	    raise RUBYAMFException.new(RUBYAMFException.USER_ERROR,"You cannot raise a FaultObject, return it instead.")
   	  else  
@@ -270,10 +273,8 @@ class InvokeAction
 	end
 end
 
-#Invoke a service call on the loaded class (loads the class in the class_action)
+#Invoke ActionController's process on the target controller action
 class RailsInvokeAction
-  
-  require 'util/action_controller_run_target'
   
 	def run(amfbody)
 	  if amfbody.exec == false
@@ -303,57 +304,45 @@ class RailsInvokeAction
 		elsif !@service.public_methods.include?(@amfbody.service_method_name)
 			raise RUBYAMFException.new(RUBYAMFException.METHOD_UNDEFINED_METHOD_ERROR, "The method {#{@amfbody.service_method_name}} in class {#{@amfbody.class_file_uri}#{@amfbody.class_file}} is not declared.")
 		end
-			
-		begin
-		  #attribute injections
-      class << @service
-        attr_accessor :params
-        attr_accessor :cookies
-        attr_accessor :session
-        attr_accessor :response
-        attr_accessor :request
-      end
-      @service.response = RequestStore.rails_response
-      @service.request = RequestStore.rails_request
-      @service.cookies = RequestStore.rails_cookies
-      @service.session = RequestStore.rails_session
-      
-			if @amfbody.value.empty?
-        @service_result = @service.run_target_with_filters(@amfbody.service_method_name)
-			else
-			  if RequestStore.use_params_hash
-				  @service.params = {}
-			    @amfbody.value.each_with_index do |v,k|
-			      @service.params[k] = v
-			    end
-				  @service_result = @service.run_target_with_filters(@amfbody.service_method_name)
-        else
-			    args = @amfbody.value
-			    @service_result = @service.run_target_with_filters(@amfbody.service_method_name,*args) #splat the args
-        end			  
-			end
-  	rescue Exception => e #catch raised FaultObjects
-  	  if e.message == "exception class/object expected"
-  	    raise RUBYAMFException.new(RUBYAMFException.USER_ERROR,"You cannot raise a FaultObject, return it instead.")
-  	  else  
-  	    raise RUBYAMFException.new(RUBYAMFException.USER_ERROR,e.message)
-  	  end
-  	end
-  			
-		#handles custom faultobjects
-		if @service_result.class.to_s == 'FaultObject'
-		  raise RUBYAMFException.new(@service_result.code, @service_result.message)
-		end
 				
-		@amfbody.results = @service_result #set the result in this body object
+		#clone the request and response and alter it for the target controller/method
+		req = RequestStore.rails_request.clone
+		res = RequestStore.rails_response.clone
 		
+		#change the request controller/action targets and tell the service to process. THIS IS THE VOODOO. SWEET!
+	  ct = @amfbody.target_uri.clone.split('Controller')[0].downcase
+	  sm = @amfbody.service_method_name
+		req.parameters['controller'] = ct
+		req.parameters['action'] = sm
+		req.request_parameters['controller'] = ct
+		req.request_parameters['action'] = sm
+		req.request_parameters['amf'] = 'hello world'
+		req.path_parameters['controller'] = ct
+		req.path_parameters['action'] = ct
+		req.env['PATH_INFO'] = "#{ct}/#{sm}"
+		req.env['REQUEST_PATH'] = "#{ct}/#{sm}"
+		req.env['REQUEST_URI'] = "#{ct}/#{sm}"
+		
+		@service.is_amf = true
+		@service.is_rubyamf = true
+    
+		if @amfbody.value.empty?
+		  @service.process(req,res)
+		else
+		  @amfbody.value.each_with_index do |item,i|
+		    req.parameters[i] = item
+      end
+	    @service.process(req,res)
+    end
+    
 		#amf3
+		@amfbody.results = @service.amf_content
     if @amfbody.special_handling == 'RemotingMessage'
       @wrapper = generate_acknowledge_object(@amfbody.get_meta('messageId'), @amfbody.get_meta('clientId'))
-      @wrapper.body = @service_result
+      @wrapper.body = @service.amf_content
       @amfbody.results = @wrapper
 		end
-	  @amfbody.success! #set the success response uri flag (/onResult)		
+	  @amfbody.success! #set the success response uri flag (/onResult)
 	end
 end
 
@@ -373,7 +362,7 @@ class ResultAdapterAction
     begin
       adapters = Adapters.get_adapters
       if adapters.class.to_s == "Array"
-        if adapters.empty?
+        if adapters.empty? || adapters.nil?
           new_results = results
         else
           adapters.each do |adapter|

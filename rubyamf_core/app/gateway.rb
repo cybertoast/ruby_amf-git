@@ -12,6 +12,7 @@ require 'util/openstruct' #Include Object stuff here.
 require 'util/string'
 require 'util/log'
 require 'util/net_debug'
+require 'util/active_record' #Include active record updates
 require 'logger'
 require 'zlib'
 include RUBYAMF::Actions

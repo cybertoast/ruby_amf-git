@@ -1,4 +1,4 @@
-#Object
+#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 require 'app/configuration'
 class Object
   

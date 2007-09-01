@@ -12,15 +12,12 @@ class MysqlAdapter
         return true
       end
     rescue Exception => e
-      false
+      return false
     end
 	end
 	
 	#run the action on an AMFBody#result instance var
-	def run(result)
-		
-		puts "RUN MYSQL ADAPTER"
-		
+	def run(result)		
 		column_names = Array.new #store the column names
 		fields = result.fetch_fields #get all the fields
 		fields.each do |field|

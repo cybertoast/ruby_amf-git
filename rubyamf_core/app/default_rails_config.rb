@@ -12,7 +12,7 @@
 # :type       #Used to spectify the type of VO, valid options are 'active_record', 'custom',  (or don't specify at all)
 # :instance   #tells RubyAMF Lite to use this value object only if the incmoing request was under that application instances scope. (this is for RubyAMF Lite only)
 #
-#If you are using ActiveRecord VO's you do not need to specify a fully qualified class path to the model, you can 
+#If you are using ActiveRecord VO's you do not need to specify a fully qualified class path to the model, you can
 #just define the class name, 
 #EX: ValueObjects.register({:incoming => 'Person', :map_to => 'Person', :outgoing => 'Person', :type => 'active_record'})
 #
@@ -42,6 +42,7 @@
 #'use_adapter?' is used to qualify your results to be run against this adapter
 #'run' is used to actually run the results through the adapter, and alters your service result to whatever the adapter chooses.
 #this happens before serializing the result
+#See the MysqlAdapter or the ActiveRecordAdapter for an example of building an adapter
 ##################################
 Adapters.register('active_record_adapter', 'ActiveRecordAdapter')
 #Adapters.register('firebird_fireruby_adapter', 'FirebirdFirerubyAdapter')

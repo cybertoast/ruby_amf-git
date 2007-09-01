@@ -4,7 +4,8 @@ require 'app/gateway'
 require 'ostruct'
 require 'util/object' #Include Object stuff here.
 require 'util/openstruct' #Include Object stuff here.
-require 'util/active_record' #Include active record shortcuts
+require 'util/active_record' #Include active record updates
+require 'util/action_controller' #Include action controller updates
 require 'app/request_store'
 require 'app/amf'
 require 'exception/exception_handler'

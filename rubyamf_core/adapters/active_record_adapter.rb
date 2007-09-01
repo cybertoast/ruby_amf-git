@@ -93,9 +93,11 @@ class ActiveRecordAdapter
       end
       
       #turn the outgoing object into a VO if neccessary
-      map = VoUtil.get_vo_definition_from_active_record(um[0].class.to_s)
-      if map != nil
-        o._explicitType = map[:outgoing]
+      if !TESTING
+        map = VoUtil.get_vo_definition_from_active_record(um[0].class.to_s)
+        if map != nil
+          o._explicitType = map[:outgoing]
+        end
       end
       
       #first write the primary "attributes" on this AR object
@@ -147,9 +149,11 @@ class ActiveRecordAdapter
       end
 
       #turn the outgoing object into a VO if neccessary
-      map = VoUtil.get_vo_definition_from_active_record(us.class.to_s)
-      if map != nil
-        o._explicitType = map[:outgoing]
+      if !TESTING
+        map = VoUtil.get_vo_definition_from_active_record(us.class.to_s)
+        if map != nil
+          o._explicitType = map[:outgoing]
+        end
       end
       
       #first write the primary "attributes" on this AR object
@@ -188,19 +192,25 @@ class ActiveRecordAdapter
 end
 
 
-#require 'user'
-#require 'address'
-
 =begin
+TESTING = true
+require 'rubygems'
+require 'active_record'
+require '../../services/org/universalremoting/browser/support/ar_models/user'
+require '../../services/org/universalremoting/browser/support/ar_models/address'
+require '../util/active_record'
+
+ar = ActiveRecordAdapter.new
+
 ActiveRecord::Base.establish_connection(:adapter => 'mysql', :host => 'localhost', :password => '', :username => 'root', :database => 'ar_rubyamf_testings')
 
 ### multiple results, including some other associations
 mult = User.find(:all, :include => :addresses)
 
 ### single result
-sing = User.find(1, :include => :addresses)
+sing = User.find(402, :include => :addresses)
 
-final = run_multiple(mult)
+final = ar.run_multiple(mult)
 puts "MULTIPLE -> RESULTS"
 puts '--------------'
 puts final.inspect
@@ -209,7 +219,7 @@ puts final[0].inspect
 
 puts "\n\n"
 
-finals = run_single(sing)
+finals = ar.run_single(sing)
 puts "SINGLE -> RESULT"
 puts '--------------'
 puts finals.inspect

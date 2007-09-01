@@ -1,4 +1,4 @@
-#Active Record helper methods
+#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 class ActiveRecord::Base
   @rubyamf_single_ar = false
   def as_single!
