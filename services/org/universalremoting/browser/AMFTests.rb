@@ -6,7 +6,7 @@ require 'rubyful_soup'
 require RUBYAMF_CORE + 'util/net_debug'
 require RUBYAMF_HELPERS + 'fault_object'
 
-require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/ar_models/datas'
+#require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/ar_models/datas'
 #require RUBYAMF_SERVICES + 'org/universalremoting/browser/support/vo/person'
 
 #this class implements the universal remoting browser tests that are bundled with the application
@@ -48,7 +48,8 @@ class AMFTests
 	end
 	
 	#Get a custom fault object
-	def getFaultObject
+	def getFaultObject(am3)
+	  puts am3
 	  return FaultObject.new(3, "This is an error object")
 	end
 	

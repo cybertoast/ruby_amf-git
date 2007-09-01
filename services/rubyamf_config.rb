@@ -11,7 +11,7 @@
 #App instances main purpose is for incoming (from flex / flash) ActiveRecord value objects. Because 
 #ActiveRecord must be connected before instantiating an AR instance. App instances allow RubyAMF to 
 #catch requests, and do the neccessary active record connecting before you receive anything in your 
-#service method. So if you're using ACtiveRecord value object's and are expecting ActiveRecord value objects 
+#service method. So if you're using ActiveRecord value object's and are expecting ActiveRecord value objects
 #you MUST define an application instance.
 #
 #If you are not using ActiveRecore value objects, no application instances are neccessary, and 
@@ -41,14 +41,14 @@
 #
 ##################################
 #APPLICATION INSTANCE DEFINITIONS HERE
-Application::Instance.register({
-  :name => 'universalremoting',
-  :initialize => 'active_record',
-  :source => 'org.universalremoting.browser.*',
-  :database_config => 'org/universalremoting/browser/test.yaml',
-  :database_node => 'development',
-  :models_path => 'org/universalremoting/browser/support/ar_models/*'
-})
+#Application::Instance.register({
+#  :name => 'universalremoting',
+#  :initialize => 'active_record',
+#  :source => 'org.universalremoting.browser.*',
+#  :database_config => 'org/universalremoting/browser/test.yaml',
+#  :database_node => 'development',
+#  :models_path => 'org/universalremoting/browser/support/ar_models/*'
+#})
 
 
 
@@ -81,16 +81,14 @@ Application::Instance.register({
 #
 ##################################
 #APPLICATION INSTANCE SPECIFIC VALUE OBJECTS HERE
-ValueObjects.register({:incoming => 'Person', :map_to => 'Person', :outgoing => 'Person', :type => 'active_record', :instance => 'universalremoting'})
-ValueObjects.register({:incoming => 'User', :map_to => 'User', :outgoing => 'User', :type => 'active_record', :instance => 'universalremoting' })
-ValueObjects.register({:incoming => 'Address', :map_to => 'Address', :outgoing => 'Address', :type => 'active_record', :instance => 'universalremoting'})
+#ValueObjects.register({:incoming => 'Person', :map_to => 'Person', :outgoing => 'Person', :type => 'active_record', :instance => 'universalremoting'})
+#ValueObjects.register({:incoming => 'User', :map_to => 'User', :outgoing => 'User', :type => 'active_record', :instance => 'universalremoting' })
+#ValueObjects.register({:incoming => 'Address', :map_to => 'Address', :outgoing => 'Address', :type => 'active_record', :instance => 'universalremoting'})
 
 #GLOBAL VALUE OBJECTS HERE
 #ValueObjects.register({:incoming => 'Person', :map_to => 'org.universalremoting.browser.support.vo.person', :outgoing => 'Person' })
 #ValueObjects.register({:incoming => 'Person2', :map_to => 'org.universalremoting.browser.support.vo.person2', :outgoing => 'Person2' })
 #ValueObjects.register({:incoming => '', :map_to => 'Person', :outgoing => 'Person' })
-
-
 
 
 ##################################
@@ -102,6 +100,7 @@ ValueObjects.register({:incoming => 'Address', :map_to => 'Address', :outgoing =
 #'use_adapter?' is used to qualify your results to be run against this adapter
 #'run' is used to actually run the results through the adapter, and alters your service result to whatever the adapter chooses.
 #this happens before serializing the result
+#See the MysqlAdapter or the ActiveRecordAdapter for an example of building an adapter
 ##################################
 Adapters.register('active_record_adapter', 'ActiveRecordAdapter')
 #Adapters.register('firebird_fireruby_adapter', 'FirebirdFirerubyAdapter')
