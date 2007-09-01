@@ -336,6 +336,9 @@ class RailsInvokeAction
 	    @service.process(req,res)
     end
     
+    @service.is_amf = false
+		@service.is_rubyamf = false
+		
 		#amf3
 		@amfbody.results = @service.amf_content
     if @amfbody.special_handling == 'RemotingMessage'
