@@ -111,7 +111,6 @@ class ApplictionInstanceInitAction
         require 'rubygems'
         require 'active_record'
         $:.unshift(RUBYAMF_CORE) #ensure the rubyamf_core load path is still first
-        require 'util/active_record'
       rescue LoadError => e
         raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "You have a Value Object defined that use ActiveRecord, but the ActiveRecord gem is not installed.")
       end

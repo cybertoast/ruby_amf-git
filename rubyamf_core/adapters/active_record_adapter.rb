@@ -7,7 +7,7 @@ class ActiveRecordAdapter
     if(use_multiple?(results) || use_single?(results))
       return true
     end
-    return false
+    false
   end
   
   #run the results through this adapter
@@ -17,7 +17,7 @@ class ActiveRecordAdapter
     else
       results = run_single(results)
     end
-    return results
+    results
   end
 
   #is the result an array of active records
@@ -25,7 +25,7 @@ class ActiveRecordAdapter
     if(results.class.to_s == 'Array' && results[0].class.superclass.to_s == 'ActiveRecord::Base')
       return true
     end
-    return false
+    false
   end
 
   #is this result a single active record?
@@ -183,8 +183,7 @@ class ActiveRecordAdapter
       c += 1
     end
     initial_data
-  end
-  
+  end  
 end
 
 
