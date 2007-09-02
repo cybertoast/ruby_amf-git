@@ -60,7 +60,7 @@ class WEBrickServlet < WEBrick::HTTPServlet::AbstractServlet
 		  
   		#set pathing options for the gateway
   		gateway.services_path = RUBYAMF_SERVICES
-  		gateway.config_path = RUBYAMF_SERVICES
+  		gateway.config_path = RUBYAMF_SERVICES + '/config/'
 		  
   		#default log level (debug, info, warn, error, fatal, none)
   		gateway.log_level = OPTIONS[:log_level]

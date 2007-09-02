@@ -1,9 +1,10 @@
 #This Install script is for Rails Plugin Installation. If using the RubyAMF Lite this is not needed.
 begin
   require 'fileutils'
-  FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/app/rubyamf_controller.rb","./app/controllers/rubyamf_controller.rb",false)
-  FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/app/default_rails_config.rb", "./config/rubyamf_config.rb", false)
-  FileUtils.copy_file("./vendor/plugins/rubyamf/public/crossdomain.xml","./public/crossdomain.xml", false)
+  FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/rails_installer_files/rubyamf_controller.rb","./app/controllers/rubyamf_controller.rb",false)
+  FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/rails_installer_files/vo_config.rb", "./config/rubyamf/vo_config.rb", false)
+  FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/rails_installer_files/adapters_config.rb", "./config/rubyamf/adapters_config.rb", false)
+  FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/rails_installer_files/crossdomain.xml","./public/crossdomain.xml", false)
   
   mime = true
   File.open("./config/environment.rb","r") do |f|

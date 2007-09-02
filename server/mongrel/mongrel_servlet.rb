@@ -54,7 +54,7 @@ class MongrelServlet < Mongrel::HttpHandler
           
       		#set the services path relative to this gateway.servlet file
       		gateway.services_path = RUBYAMF_SERVICES
-      		gateway.config_path = RUBYAMF_SERVICES
+      		gateway.config_path = RUBYAMF_SERVICES + '/config/'
       		
       		#the value object mapping location
     		  gateway.set_vo_path = RUBYAMF_SERVICES + 'vo'

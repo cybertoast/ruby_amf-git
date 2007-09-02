@@ -106,12 +106,14 @@ class Gateway
 			@log.level = Logger::FATAL
 		end
 	end
-	
+
 private
 	#This just requires the config file so that that configuration code runs
 	def app_config
 	  begin
-	    require RequestStore.config_path + 'rubyamf_config'
+	    require RequestStore.config_path + 'vo_config'
+	    require RequestStore.config_path + 'adapters_config'
+	    require RequestStore.config_path + 'application_instance_config'
 	  rescue Exception => e
 	    STDOUT.puts "You have an error in your rubyamf_config file, please correct it."
 	    STDOUT.puts e.message
