@@ -1,8 +1,10 @@
 #Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 class ActiveRecord::Base
   
+  #This member, and the "single" methods are used for ActiveRecord#as_single!
+  #which causes RubyAMF to write just an object to the stream, instead of wrapping
+  #the object in an array.
   @rubyamf_single_ar = false
-  #these three methods are used when returning an ActiveRecord#as_single!
   def as_single!
     @rubyamf_single_ar = true
     self
@@ -14,8 +16,7 @@ class ActiveRecord::Base
   def single?
     @rubyamf_single_ar
   end
-
-=begin
+  
   #get any associated data on an AR instance (from :include)
   def get_associates
     keys = ['==','===','[]','[]=','abstract_class?','attr_accessible',
@@ -48,12 +49,13 @@ class ActiveRecord::Base
     end
     finals
   end
-  
+
   #get column_names for an active_record
   def get_column_names
     return self.attributes.map{|k,v| k}
   end
   
+  #turn this ActiveRecord into an update hash
   def to_update_hash
     o = {}
     column_names = self.get_column_names
@@ -61,31 +63,19 @@ class ActiveRecord::Base
     #first write the primary "attributes" on this AR object
     column_names.each_with_index do |v,k|
       k = column_names[k]
-      val = us.send(:"#{k}")
-      eval("o.#{k}=val")
+      val = self.send(:"#{k}")
+      o[k] = val
     end
     
     associations = self.get_associates
-    if(!associations.empty?)
+    if !associations.empty? && associations != nil
       #now write the associated models with this AR
       associations.each do |associate|
         na = associate[1, associate.length]
         ar = self.send(:"#{na}")
-        if !ar.empty? && !ar.nil?
-          if(ar.class.superclass.to_s == 'ActiveRecord::Base')
-            update_hash = ar.to_update_hash   #recurse into single AR method for same data structure
-          elsif(ar[0].class.superclass == 'ActiveRecord::Base')
-            update_hash = {}
-            ar.each do |a|
-              u = a.to_update_hash
-              update_hash << u
-            end
-          end
-          eval("o.#{na}=update_hash")
-        end
+        o[na] = ar
       end
     end
     o
   end
-=end
 end

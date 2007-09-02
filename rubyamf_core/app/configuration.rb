@@ -65,7 +65,8 @@ class ValueObjects
   
   @@vo_mappings = []
   @@vo_by_instances_lookup = {}
-  
+  @@mapping_type = ''
+
   #register a value object map
   def ValueObjects.register(hash)
     if hash[:instance] != nil
@@ -77,7 +78,7 @@ class ValueObjects
       @@vo_mappings << hash
     end
   end
-  
+    
   #Get ValueObject mappings for this request
   def ValueObjects.get_vo_mappings
     maps = []
@@ -103,6 +104,17 @@ class ValueObjects
     end
     maps
   end
+  
+  #the rails parameter mapping type
+  def ValueObjects.rails_parameter_mapping_type=(val)
+    @@mapping_type = val
+  end
+  
+  #the rails parameter mapping type
+  def ValueObjects.rails_parameter_mapping_type
+    @@mapping_type
+  end
+  
 end
 
 end
