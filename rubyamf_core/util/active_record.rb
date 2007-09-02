@@ -14,7 +14,8 @@ class ActiveRecord::Base
   def single?
     @rubyamf_single_ar
   end
-  
+
+=begin
   #get any associated data on an AR instance (from :include)
   def get_associates
     keys = ['==','===','[]','[]=','abstract_class?','attr_accessible',
@@ -86,5 +87,5 @@ class ActiveRecord::Base
     end
     o
   end
-  
+=end
 end
