@@ -44,7 +44,7 @@ class AuthenticationFilter
 	  begin
 	    RequestStore.auth_header = nil
 	  rescue Exception => e
-	  end	  
+	  end
 		auth_header = amfobj.get_header_by_key('Credentials')
 		if auth_header
 		  RequestStore.auth_header = auth_header #store the auth header for later

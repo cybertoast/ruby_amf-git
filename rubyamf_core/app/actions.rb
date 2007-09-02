@@ -323,20 +323,34 @@ class RailsInvokeAction
 		req.env['REQUEST_URI'] = "#{ct}/#{sm}"
 		req.env['HTTP_ACCEPT'] = 'application/x-amf,' + req.env['HTTP_ACCEPT'].to_s
 		
+		#set conditional helper
 		@service.is_amf = true
 		@service.is_rubyamf = true
     
-		if @amfbody.value.empty?
+    #process the request
+		if @amfbody.value.empty? || @amfbody.value.nil?
 		  @service.process(req,res)
 		else
 		  @amfbody.value.each_with_index do |item,i|
-		    req.parameters[i] = item
+		    if item.class.superclass.to_s == 'ActiveRecord::Base'
+		      req.parameters[item.class.to_s.downcase] = item
+		    elsif !item._explicitType.nil?
+  		    req.parameters[item._explicitType.to_sym] = item
+		    else
+		      req.parameters[i] = item
+		    end
       end
 	    @service.process(req,res)
     end
     
+    #unset conditional helper
     @service.is_amf = false
 		@service.is_rubyamf = false
+    
+		#handle FaultObjects
+		if @service.amf_content.class.to_s == 'FaultObject' #catch returned FaultObjects
+      raise RUBYAMFException.new(@service.amf_content.code, @service.amf_content.message)
+		end
 		
 		#amf3
 		@amfbody.results = @service.amf_content
