@@ -1,6 +1,7 @@
 #This Install script is for Rails Plugin Installation. If using the RubyAMF Lite this is not needed.
 begin
   require 'fileutils'
+  Dir.mkdir("./config/rubyamf/")
   FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/rails_installer_files/rubyamf_controller.rb","./app/controllers/rubyamf_controller.rb",false)
   FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/rails_installer_files/vo_config.rb", "./config/rubyamf/vo_config.rb", false)
   FileUtils.copy_file("./vendor/plugins/rubyamf/rubyamf_core/rails_installer_files/adapters_config.rb", "./config/rubyamf/adapters_config.rb", false)
