@@ -1,7 +1,7 @@
 #Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 class ActiveRecord::Base
-  @rubyamf_single_ar = false
   
+  @rubyamf_single_ar = false
   #these three methods are used when returning an ActiveRecord#as_single!
   def as_single!
     @rubyamf_single_ar = true
