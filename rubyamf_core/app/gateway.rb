@@ -48,7 +48,7 @@ class Gateway
 		amfobj = AMFObject.new(raw)
 		filter_chain = FilterChain.new
 		filter_chain.run(amfobj)
-		if(RequestStore.gzip)
+		if RequestStore.gzip
 		  return Zlib::Deflate.deflate(amfobj.output_stream)
 		else
 		  return amfobj.output_stream

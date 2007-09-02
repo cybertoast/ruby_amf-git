@@ -63,7 +63,7 @@ class RubyamfController < ActionController::Base
 			
 			#Compress the amf output for smaller data transfer over the wire
 			if(request.env['ACCEPT_ENCODING'].to_s.match(/gzip,[\s]{0,1}deflate/))
-			  gateway.gzip_outgoing = false #leave false, this doesn't completely work yet. Will the near future
+			  gateway.gzip_outgoing = true
 			end
 			
   	  #if not flash user agent, send some html content
