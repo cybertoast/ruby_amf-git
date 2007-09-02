@@ -99,7 +99,7 @@ class VoUtil
   #make an init hash for AR from an open struct
   def self.make_hash_for_active_record_from_open_struct(os)
     hash = {}
-    members = os.marshal_dump.keys.map{|k| k.to_s}
+    members = os.get_members
     members.each do |key|
       if key == '_explicitType' || key == 'rmembers'
         next
