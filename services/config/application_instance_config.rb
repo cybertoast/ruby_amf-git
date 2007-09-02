@@ -29,6 +29,7 @@
 # EX:
 #  Application::Instance.register({
 #     :name => 'universalremoting',
+#     :initialize => 'active_record'
 #     :source => 'org.universalremoting.browser.*',
 #     :database_config => 'org/universalremoting/browser/test.yaml',
 #     :database_node => 'development',
