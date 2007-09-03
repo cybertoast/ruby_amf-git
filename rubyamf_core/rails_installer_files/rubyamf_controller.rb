@@ -29,8 +29,6 @@ class RubyamfController < ActionController::Base
   		
   		#clear auth hash
   		RequestStore.rails_authentication = {}
-  		RequestStore.rails_session = session
-  		RequestStore.rails_cookies = cookies
   		RequestStore.rails_request = request
   		RequestStore.rails_response = response
   		
