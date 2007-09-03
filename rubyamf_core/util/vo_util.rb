@@ -119,7 +119,13 @@ class VoUtil
     if os._explicitType == nil
       return nil
     end
-    classname = os._explicitType
+
+    if os._explicitType.include?('.')
+      classname = os._explicitType.split('.').last
+    else
+      classname = os._explicitType
+    end
+
     hash = self.make_hash_for_active_record_from_open_struct(os)
     ar = Object.const_get(classname).new(hash)
     return ar
