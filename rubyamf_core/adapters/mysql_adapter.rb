@@ -34,7 +34,6 @@ class MysqlAdapter
 				
 		asrecordset = ASRecordset.new(row_count,column_names,initial_data)
 		result = asrecordset
-		puts result.inspect
 		return result
 	end
 end
