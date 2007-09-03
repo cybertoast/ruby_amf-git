@@ -36,8 +36,6 @@ class RequestStore
   @app_instance
   
   #Rails Specific Members
-  @rails_cookies
-  @rails_session
   @rails_request
   @rails_response
 
@@ -71,8 +69,6 @@ class RequestStore
 	  attr_accessor :app_instance
 	  
 	  #Rails Specific Members
-	  attr_accessor :rails_cookies
-	  attr_accessor :rails_session
 	  attr_accessor :reload_services
 	  attr_accessor :rails_request
 	  attr_accessor :rails_response
