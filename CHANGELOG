@@ -1,4 +1,7 @@
---changes 1.3 RC2 revision 766
+--changes 1.3 Final
+#Fixed bug when taking incoming VO's and mapping them to AR. I wasn't dealing with an :incoming class path (such as vo.Task). Now I strip off the class path and just use the class. (Task.downcase). This was causing the VO to be put in params['vo.Task']. Dah.
+
+--changes 1.3 RC2 revision 742
 #Added in FaultObject handling when sending back FaultObjects from Controller's, it had been stripped out when rewriting the rails plugin.
 #changed service.is_amf / service.is_rubyamf to 'false' after the service call to rails controller
 #gzip works now, strange as I didn't change anything specifically for it
