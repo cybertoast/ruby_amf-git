@@ -22,7 +22,7 @@ class RubyamfController < ActionController::Base
   	  #this has to be set as the very first thing, as trying to change the logger to use a log file after it's been initialized fails
   	  Log.SetLogFile(RUBYAMF_CORE + '/logs/rubyamf.log')
   	  @log = Log.instance #init the logger, set level below
-   		RequestStore.reload_services = ENVIORNMENT != 'production' ? true : false
+   		RequestStore.reload_services = false
    		
   		#create a new rubyamf gateway for processing
   		gateway = RailsGateway.new
