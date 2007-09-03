@@ -105,11 +105,7 @@ class VoUtil
         next
       end
       val = os.send(:"#{key}")
-      if val == nil || val == 'NaN' || val == 'undefined'
-        hash[key] = []
-      else
-        hash[key] = val
-      end
+      hash[key] = val
     end
     hash
   end
@@ -127,6 +123,7 @@ class VoUtil
     end
 
     hash = self.make_hash_for_active_record_from_open_struct(os)
+    ActiveRecord::Base.update_nil_associations(Object.const_get(classname),hash) #update the hash so nil assotiations don't mess up AR
     ar = Object.const_get(classname).new(hash)
     return ar
   end

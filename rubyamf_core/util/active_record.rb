@@ -17,7 +17,8 @@ class ActiveRecord::Base
     @rubyamf_single_ar
   end
   
-  #get any associated data on an AR instance (from :include)
+  #get any associated data on an AR instance. I don't use AR reflection here
+  #because it causes problems when recursing in the active_record_adapter.
   def get_associates
     keys = ['==','===','[]','[]=','abstract_class?','attr_accessible',
     'attr_protected','attribute_names','attribute_present?','attributes',
@@ -77,5 +78,27 @@ class ActiveRecord::Base
       end
     end
     o
+  end
+  
+  #This takes an update hash used in instantiating new ActiveRecord instances,
+  #and updates any members that are considered associations but didn't
+  #have any values sent with it (nil)
+  def self.update_nil_associations(klass, hash)
+    associations = klass.reflect_on_all_associations
+    if !associations.empty? && !associations.nil?
+      associations.each do |ass|
+        n = ass.name
+        if ass.macro == :belongs_to
+          val = nil
+        elsif ass.macro == :has_many
+          val = []
+        elsif ass.macro == :has_and_belongs_to_many
+          val = []
+        end
+        if (hash[n] == nil || hash[n] == 'NaN' || hash[n] == 'undefined')
+          hash[ass.name] = val
+        end
+      end
+    end
   end
 end
