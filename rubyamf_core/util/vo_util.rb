@@ -124,6 +124,7 @@ class VoUtil
 
     hash = self.make_hash_for_active_record_from_open_struct(os)
     ActiveRecord::Base.update_nil_associations(Object.const_get(classname),hash) #update the hash so nil assotiations don't mess up AR
+    ActiveRecord::Base.update_nans(hash)
     ar = Object.const_get(classname).new(hash)
     return ar
   end
