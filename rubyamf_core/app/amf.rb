@@ -334,8 +334,8 @@ class ASFault < OpenStruct
 		self.line = line
 		self.function = method
 		self.faultString = e.message
-		self.faultCode = 'whatever' #e.type.to_s
-		self.backtrace = backtrace if RequestStore.use_backtraces == true #only show backtrace if allowable
+		self.faultCode = e.etype.to_s
+		self.backtrace = backtrace
 	end
 end
 
@@ -345,36 +345,13 @@ class AS3Fault < OpenStruct
   #pass a RUBYAMFException, create new keys based on exception for the fault object
 	def initialize(e)
 		super(nil)
-		
-		backtrace = e.backtrace || e.ebacktrace #grab the correct backtrace
-		
-		begin
-		  linerx = /:(\d*):/
-  		line = linerx.match(backtrace[0])[1] #get the numbers
-		rescue Exception => e
-	    line = 'No backtrace was found in this exception'
-	  end
-	  
-	  begin
-		  methodrx = /`(\S*)\'/
-  		method = methodrx.match(backtrace[0])[1] #just method name
-		rescue Exception => e
-		  method = "No method was found in this exception"
-		end
-		
-		begin
-  		classrx = /([a-zA-Z0-9_]*)\.rb/
-  		classm = classrx.match(backtrace[0]) #class name
-	  rescue Exception => e
-	    classm = "No class was found in this exception"
-	  end
-		
+		backtrace = e.backtrace || e.ebacktrace #grab the correct backtrace		
     self._explicitType = 'flex.messaging.messages.ErrorMessage'
 		self.faultCode = e.etype.to_s #e.type.to_s
 		self.faultString = e.message
-		self.faultDetail = backtrace[0]
-		self.rootCause = ""
-    self.extendedData = backtrace if RequestStore.use_backtraces == true #only show backtrace if allowable
+		self.faultDetail = backtrace
+		self.rootCause = backtrace[0]
+    self.extendedData = backtrace
 	end
 end
 

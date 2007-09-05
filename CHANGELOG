@@ -1,14 +1,18 @@
---changes 1.3 revision 754
+--changes 1.3 revision 756
 #Fixed bug when taking incoming VO's and mapping them to AR. I wasn't dealing with an :incoming class path (such as vo.Task). Now I strip off the class path and just use the class. (Task.downcase). This was causing the VO to be put in params['vo.Task']. Dah.
 #Fixed slight problem with incoming VO's and nil associated model data. If an incoming associated model was nil it was automatically becoming an Array. It's handled a little more graceful with ActiveRecord reflections to find out what an incoming nil members real value should be (Array / nil). If :has_many, val == []. If :belongs_to, val == nil, if :has_and_belongs_to_many, val = []
 #created_at and updated_at now work correctly according to ActiveRecord, because of the above bug fix.
+#took out puts in mysql_adapter
+#updated rails installer. It won't overwrite vo_config / adapter_config if it exists.
 
---changes 1.3 RC2 revision 742
+--changes 1.3 RC2 revision 748
 #Added in FaultObject handling when sending back FaultObjects from Controller's, it had been stripped out when rewriting the rails plugin.
-#changed service.is_amf / service.is_rubyamf to 'false' after the service call to rails controller
-#gzip works now, strange as I didn't change anything specifically for it
 #split vo / adapter configs into two files, now the configs live in rails/config/rubyamf. For LITE, the configs are now in rubyamf/services/config/
 #added ValueObjects.rails_parameter_mapping_type, to specify what get's put into params[:[voclass]]. Read the vo_config file fore more information
+
+--changes 1.3 RC2 revision 742
+#changed service.is_amf / service.is_rubyamf to 'false' after the service call to rails controller
+#gzip works now, strange as I didn't change anything specifically for it
 
 --changes 1.3 RC2
 #fixed Rails production environment problem
