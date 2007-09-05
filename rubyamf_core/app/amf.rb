@@ -326,7 +326,7 @@ class ASFault < OpenStruct
 	    classm = "No class was found in this exception"
 	  end
 		
-		self.code = 'whatever' #e.type.to_s
+		self.code = e.etype.to_s #e.type.to_s
 		self.description = e.message
 		self.details = backtrace[0]
 		self.level = 'UserError'
@@ -370,12 +370,11 @@ class AS3Fault < OpenStruct
 	  end
 		
     self._explicitType = 'flex.messaging.messages.ErrorMessage'
-		self.faultCode = 'whatever' #e.type.to_s
+		self.faultCode = e.etype.to_s #e.type.to_s
 		self.faultString = e.message
 		self.faultDetail = backtrace[0]
 		self.rootCause = ""
-    self.extendedData = ""
-		self.backtrace = backtrace if RequestStore.use_backtraces == true #only show backtrace if allowable
+    self.extendedData = backtrace if RequestStore.use_backtraces == true #only show backtrace if allowable
 	end
 end
 
