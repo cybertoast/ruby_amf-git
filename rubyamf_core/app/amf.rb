@@ -270,7 +270,7 @@ class AMFBody
 	
 	#set class file uri for amf3
 	def set_amf3_class_file_and_uri
-		#Catch missing 'source' property on RemoteObject
+		#Catch missing source property on RemoteObject
 		if @target_uri.nil?
 		  if RequestStore.flex_messaging
 		    raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "There is no \"source\" property defined on your RemoteObject, please see RemoteObject documentation for more information.")
