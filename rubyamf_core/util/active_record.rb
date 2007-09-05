@@ -90,26 +90,19 @@ class ActiveRecord::Base
         n = ass.name.to_s    
         if ass.macro == :belongs_to
           if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
-            val = nil                                
-          else                                       
-            val = hash[n]
+            hash[n] = nil
           end                                        
         
         elsif ass.macro == :has_many
           if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
-            val = []                                 
-          else                                       
-            val = hash[n]                       
+            hash[n] = []         
           end                                        
 
         elsif ass.macro == :has_and_belongs_to_many
           if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
-            val = []
-          else
-            val = hash[n]
+            hash[n] = []
           end
         end
-        hash[n] = val
       end
     end
     hash
