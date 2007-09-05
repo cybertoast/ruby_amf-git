@@ -270,7 +270,15 @@ class AMFBody
 	
 	#set class file uri for amf3
 	def set_amf3_class_file_and_uri
-		if @target_uri.include?('.')
+		#Catch missing 'source' property on RemoteObject
+		if @target_uri.nil?
+		  if RequestStore.flex_messaging
+		    raise RUBYAMFException.new(RUBYAMFException.USER_ERROR, "There is no \"source\" property defined on your RemoteObject, please see RemoteObject documentation for more information.")
+		  else
+		    raise RUBYAMFException.new(RUBYAMFException.SERVICE_TRANSLATION_ERROR, "The correct service information was not provided to complete the service call. The service and method name were not provided")
+		  end
+		end
+	  if @target_uri.include?('.')
 			nw = @target_uri.clone.split('.')
 			@service_name = nw.last.clone
 			@class_file = nw.last.clone << '.rb'
