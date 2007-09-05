@@ -514,6 +514,7 @@ class AMFDeserializer
 		time
 	end
 	
+=begin	#OLD AMF0 VO MAPPING METHOD
 	def read_custom_class
 		type = read_utf
 		load_success = false
@@ -540,9 +541,28 @@ class AMFDeserializer
 		  return klazz
 		end
 	  value #if VO not loaded correctly, returns a standard Object
-	end
+	end	
+=end
+
+  #Reads and instantiates a custom incoming ValueObject
+  def read_custom_class
+  	type = read_utf
+  	value = read_object
 	
-	def read_mixed_array
+  	#Value Object
+    #if type not nil and it is an OpenStruct, check VO Mapping
+  	if type != nil && ob.is_a?(OpenStruct)
+      ob._explicitType = type #assign the _explictType right away, however if this is a valid VO, it get's changed in VoUtil
+      vo = VoUtil.get_vo_for_incoming(ob, type)
+      if vo != nil
+        return vo #prematurly return the new VO
+      end
+    end
+    value #return value if no VO was created
+  end
+
+  #reads a mixed array
+  def read_mixed_array
     ash = Hash.new
     key = read_utf
     type = read_byte
@@ -554,7 +574,7 @@ class AMFDeserializer
     end
     ash
   end
-  
+
   def read_object
 	  aso = OpenStruct.new
 	  amf0_object_default_members_ignore = []
