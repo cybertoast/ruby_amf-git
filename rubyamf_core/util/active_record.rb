@@ -1,6 +1,6 @@
 #Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 class ActiveRecord::Base
-  
+
   #This member, and the "single" methods are used for ActiveRecord#as_single!
   #which causes RubyAMF to write just an object to the stream, instead of wrapping
   #the object in an array.
@@ -87,18 +87,41 @@ class ActiveRecord::Base
     associations = klass.reflect_on_all_associations
     if !associations.empty? && !associations.nil?
       associations.each do |ass|
-        n = ass.name
+        n = ass.name.to_s    
         if ass.macro == :belongs_to
-          val = nil
+          if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
+            val = nil                                
+          else                                       
+            val = hash[n]
+          end                                        
+        
         elsif ass.macro == :has_many
-          val = []
+          if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
+            val = []                                 
+          else                                       
+            val = hash[n]                       
+          end                                        
+
         elsif ass.macro == :has_and_belongs_to_many
-          val = []
+          if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
+            val = []
+          else
+            val = hash[n]
+          end
         end
-        if (hash[n] == nil || hash[n] == 'NaN' || hash[n] == 'undefined')
-          hash[ass.name] = val
-        end
+        hash[n] = val
       end
     end
+    hash
+  end
+  
+  #get rid of NaN's in an incoming VO
+  def self.update_nans(hash)
+    hash.each do |k,v|
+      if v.to_s == 'NaN'
+        hash[k] = nil
+      end
+    end
+    hash
   end
 end
