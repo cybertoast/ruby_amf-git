@@ -28,7 +28,7 @@ class RailsGateway < Gateway
   
 	def initialize
     super
-		RequestStore.actions = Array[PrepareAction.new, ClassAction.new, RailsInvokeAction.new, ResultAdapterAction.new] #override the actions
+		RequestStore.actions = Array[PrepareAction.new, ClassAction.new, RailsInvokeAction.new] #override the actions
 		RequestStore.rails = true
 	end
 	

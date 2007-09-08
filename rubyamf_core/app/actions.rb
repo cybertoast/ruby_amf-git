@@ -165,7 +165,7 @@ end
 class InvokeAction
 	def run(amfbody)
 	  if amfbody.exec == false
-	    if amfbody.special_handling == 'Ping'	      
+	    if amfbody.special_handling == 'Ping'
         amfbody.results = generate_acknowledge_object(amfbody.get_meta('messageId'), amfbody.get_meta('clientId')) #generate an empty acknowledge message here, no body needed for a ping
         amfbody.success! #flag the success response
       end
@@ -268,7 +268,7 @@ class RailsInvokeAction
   
 	def run(amfbody)
 	  if amfbody.exec == false
-	    if amfbody.special_handling == 'Ping'	      
+	    if amfbody.special_handling == 'Ping'
         amfbody.results = generate_acknowledge_object(amfbody.get_meta('messageId'), amfbody.get_meta('clientId')) #generate an empty acknowledge message here, no body needed for a ping
         amfbody.success! #flag the success response
       end
@@ -355,52 +355,6 @@ class RailsInvokeAction
       @amfbody.results = @wrapper
 		end
 	  @amfbody.success! #set the success response uri flag (/onResult)
-	end
-end
-
-
-#This class qualifies a service result to be adapted into something else. Usually DB related.
-class ResultAdapterAction
-
-	def run(amfbody)
-    new_results = '' #for some reason this has to be initialized here.. not sure why
-		if amfbody.special_handling == 'RemotingMessage'
-		  results = amfbody.results.body
-		else
-		  results = amfbody.results
-		end
-    
-    begin
-      adapters = Adapters.get_adapters
-      if adapters.class.to_s == "Array"
-        if adapters.empty? || adapters.nil?
-          new_results = results
-        else
-          adapters.each do |adapter|
-            require RequestStore.adapters_path + adapter[0]
-            adapter = Object.const_get(adapter[1]).new
-            if adapter.use_adapter?(results)
-              new_results = adapter.run(results)
-              break #if an adapter is used; break before the loop breaks the results on the else condition
-            else
-              new_results = results
-            end
-          end
-        end
-      end
-    rescue RUBYAMFException => ramfe
-      raise ramfe
-    rescue Exception => e
-      ramfe = RUBYAMFException.new(e.class.to_s, e.message.to_s) #translate the exception into a rubyamf exception
-			ramfe.ebacktrace = e.backtrace.to_s
-			raise ramfe
-    end
-    
-		if amfbody.special_handling == 'RemotingMessage'
-		  amfbody.results.body = new_results
-	  else
-	    amfbody.results = new_results
-	  end
 	end
 end
 
