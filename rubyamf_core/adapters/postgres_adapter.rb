@@ -6,14 +6,10 @@ class PostgresAdapter
 	
 	#use the postgres adapter?
 	def use_adapter?(results)
-	  begin
-	    if results.class.to_s == 'PGresult'
-  	    return true
-  	  end
-  	  false
-    rescue Exception => e
-      false
-    end
+    if results.class.to_s == 'PGresult'
+	    return true
+	  end
+    false
 	end
 	
 	#run the action on an AMFBody#result instance var

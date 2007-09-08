@@ -5,12 +5,8 @@ include RUBYAMF::AMF
 class MysqlAdapter
 	
 	def use_adapter?(result)
-	  begin
-	    if result.class.to_s == 'Mysql::Result'
-        return true
-      end
-    rescue Exception => e
-      return false
+    if result.class.to_s == 'Mysql::Result'
+      return true
     end
     false
 	end

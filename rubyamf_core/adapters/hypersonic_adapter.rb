@@ -8,6 +8,7 @@ class HypersonicAdapter
 	
 	def use_adapter?(result)
 	  #not implemented
+	  false
 	end
 	
 	# run the action on an AMFBody#result instance var
