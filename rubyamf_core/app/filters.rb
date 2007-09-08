@@ -1,5 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 require 'app/amf'
 require 'exception/exception_handler'
 require 'io/amf_serializer'
@@ -69,12 +67,10 @@ class BatchFilter
 				rescue RUBYAMFException => ramfe
 				  ramfe.ebacktrace = ramfe.backtrace.to_s
 					ExceptionHandler::HandleException(ramfe,body)
-					return
 				rescue Exception => e
 					ramfe = RUBYAMFException.new(e.class.to_s, e.message.to_s) #translate the exception into a rubyamf exception
 					ramfe.ebacktrace = e.backtrace.to_s
 					ExceptionHandler::HandleException(ramfe, body)
-          return
 				end
   		end
 		end
