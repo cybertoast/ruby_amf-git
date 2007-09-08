@@ -12,15 +12,11 @@ module Actions
 #This sets up each body for processing
 class PrepareAction
   def run(amfbody)
-    #First setup everything for AMF0, will potentially be altered for AMF3 in the proceeding code.
-    amfbody.set_amf0_class_file_and_uri
-    amfbody.set_amf0_service_and_method
-    
-    RequestStore.flex_messaging = false #reset to false to ensure that further requests get a fair chance at being something other than Flex messaging.
-    if RequestStore.amf_encoding == 'amf3'
+    RequestStore.flex_messaging = false #reset to false
+    if RequestStore.amf_encoding == 'amf3' #AMF3
       tmp_val = amfbody.value[0]
       if tmp_val.is_a?(OpenStruct)
-        if tmp_val._explicitType == 'flex.messaging.messages.RemotingMessage' #Flex messaging setup
+        if tmp_val._explicitType == 'flex.messaging.messages.RemotingMessage' #Flex Messaging setup
           RequestStore.flex_messaging = true
   				amfbody.special_handling = 'RemotingMessage'
   				amfbody.value = tmp_val.body
@@ -31,13 +27,24 @@ class PrepareAction
           amfbody.service_method_name = tmp_val.operation
           amfbody._explicitType = 'flex.messaging.messages.RemotingMessage'
   				amfbody.set_amf3_class_file_and_uri
-        elsif tmp_val._explicitType == 'flex.messaging.messages.CommandMessage' && tmp_val.operation == 5 #it's a ping, don't process this body
-          amfbody.exec = false
-          amfbody.special_handling = 'Ping'
-  				amfbody.set_meta('clientId', tmp_val.clientId)
-  				amfbody.set_meta('messageId', tmp_val.messageId)
+        elsif tmp_val._explicitType == 'flex.messaging.messages.CommandMessage' #it's a ping, don't process this body
+          if tmp_val.operation == 5
+            amfbody.exec = false
+            amfbody.special_handling = 'Ping'
+    				amfbody.set_meta('clientId', tmp_val.clientId)
+    				amfbody.set_meta('messageId', tmp_val.messageId)
+    			end
+        else #is amf3, but set these props the same way as amf0, and not flex
+          amfbody.set_amf0_class_file_and_uri
+          amfbody.set_amf0_service_and_method
         end
+      else #is amf3, but set these props the same way as amf0, and not flex
+        amfbody.set_amf0_class_file_and_uri
+        amfbody.set_amf0_service_and_method
       end
+    elsif RequestStore.amf_encoding == 'amf0' #AMF0
+      amfbody.set_amf0_class_file_and_uri
+      amfbody.set_amf0_service_and_method
     end    
   end    
 end
@@ -355,6 +362,45 @@ class RailsInvokeAction
       @amfbody.results = @wrapper
 		end
 	  @amfbody.success! #set the success response uri flag (/onResult)
+	end
+end
+
+#this class takes the amfobj's results (if a db result) and adapts it to a flash recordset
+class ResultAdapterAction
+  #include Adapters #include the module that defines what adapters to test for
+  
+	def run(amfbody)
+	  #If you opted in for deep adaptation attempts don't do anything here, it will all be handled in the serializer
+	  if Adapters.deep_adaptations
+	    return
+	  end
+	  
+    new_results = '' #for some reason this has to be initialized here.. not sure why
+		if amfbody.special_handling == 'RemotingMessage'
+		  results = amfbody.results.body
+		else
+		  results = amfbody.results
+		end
+    
+    begin
+      if adapter = Adapters.get_adapter_for_result(results)
+        new_results = adapter.run(results)
+      else
+        return
+      end
+    rescue RUBYAMFException => ramfe
+      raise ramfe
+    rescue Exception => e
+      ramfe = RUBYAMFException.new(e.class.to_s, e.message.to_s)
+			ramfe.ebacktrace = e.backtrace.to_s
+			raise ramfe
+    end
+    
+		if amfbody.special_handling == 'RemotingMessage'
+		  amfbody.results.body = new_results
+	  else
+	    amfbody.results = new_results
+	  end
 	end
 end
 
