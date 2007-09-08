@@ -54,8 +54,15 @@ class Adapters
   def Adapters.register(file,classname)
     @@adapters << [file,classname]
   end
-    
+  
+  def Adapters.get_adapters
+    @@adapters
+  end
+  
   def Adapters.get_adapter_for_result(res)
+    if @@adapters.nil?
+      return false
+    end
     @@adapters.each do |adapter|
       require RequestStore.adapters_path + adapter[0]
       adapter = Object.const_get(adapter[1]).new
@@ -64,7 +71,11 @@ class Adapters
       end
     end
     false
-  end  
+  end
+    
+  class << self
+    attr_accessor :deep_adaptations
+  end
 end
 
 #ValueObjects configuration support class
