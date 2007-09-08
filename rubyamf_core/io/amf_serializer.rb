@@ -97,7 +97,6 @@ class AMFSerializer
 	    #if amf3, don't attempt any adaptations here. Otherwise this same call will be duplicated when we get to write_amf3
   	  if RequestStore.amf_encoding != 'amf3' && @adaptable_lookup[value.class.to_s] != false #true or nil will meet the condition, allowing an adaptation attempt
         if adapter = Adapters.get_adapter_for_result(value)
-          puts "RUNNING ADAPTER"
           value = adapter.run(value)
         end
       end
