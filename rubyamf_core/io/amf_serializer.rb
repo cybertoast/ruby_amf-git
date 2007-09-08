@@ -20,9 +20,13 @@ class AMFSerializer
 	def rubyamf_write(amfobj)
 	  @amfobj = amfobj
 		@stream = @amfobj.output_stream #grab the output stream for the amfobj
-		@non_adaptable = ['Array','Hash','String', 'Integer','Fixnum','Bignum',
-		'Float','Numeric','NilClass','ASRecordset', 'AS3DataProvider','TrueClass',
-		'FalseClass','Date','Time','DateTime']
+		
+		#Which major types are considered adaptable. Array and Hash are as they are used for most DB results.
+		#These are used to speed up the serialization process, otherwise ever single object written is run 
+		#through Adapters.get_adapter_for_result which slows everything way down. yikes
+		@adaptable_lookup = {'Array' => true,'Hash' => true,'String' => false,'Integer' => false,'Fixnum' => false,'Bignum' => false,
+		'Float' => false,'Numeric' => false,'NilClass' => false,'ASRecordset' => false,'AS3DataProvider' => false,'TrueClass' => false,
+		'FalseClass' => false,'Date' => false,'Time' => false,'DateTime' => false}
 	  serialize
 	end
 
@@ -89,6 +93,16 @@ class AMFSerializer
 		
 	#write Ruby data as AMF to output stream
 	def write(value)
+	  if Adapters.deep_adaptations
+	    #if amf3, don't attempt any adaptations here. Otherwise this same call will be duplicated when we get to write_amf3
+  	  if RequestStore.amf_encoding != 'amf3' && @adaptable_lookup[value.class.to_s] != false #true or nil will meet the condition, allowing an adaptation attempt
+        if adapter = Adapters.get_adapter_for_result(value)
+          puts "RUNNING ADAPTER"
+          value = adapter.run(value)
+        end
+      end
+    end
+    
 	  if value.is_a?(ASRecordset) && (RequestStore.recordset_format == 'fl9' || RequestStore.recordset_format == 'fl.data.DataProvider')
 	    write_data_provider(value)
 	  
@@ -143,15 +157,7 @@ class AMFSerializer
 			
 		elsif (value.class.to_s == 'BeautifulSoup')
       write_xml(value.to_s)
-                
-    elsif !@non_adaptable.include?(value.class.to_s)
-      if adapter = Adapters.get_adapter_for_result(value)
-        nv = adapter.run(value)
-        write(nv)
-      else
-        write_object(value)
-      end
-    
+
 		else
 			write_object(value)
 		end
@@ -159,6 +165,15 @@ class AMFSerializer
 
   #AMF3
   def write_amf3(value)
+    #adapt the result
+    if Adapters.deep_adaptations
+      if @adaptable_lookup[value.class.to_s] != false #true or nil will meet the condition, allowing an adaptation attempt
+        if adapter = Adapters.get_adapter_for_result(value)
+          value = adapter.run(value)
+        end
+      end
+    end
+    
     if(value.nil?)
       write_byte(AMF3_NULL)
     
@@ -193,7 +208,7 @@ class AMFSerializer
     elsif (value.is_a?(OpenStruct)) #easiest way to represent 'objects' here
       write_byte(AMF3_OBJECT)
 			write_amf3_object(value)
-  
+    
     elsif(value.is_a?(Array))
       write_byte(AMF3_ARRAY)
       write_amf3_array(value)
@@ -220,17 +235,7 @@ class AMFSerializer
     elsif value.class.to_s == 'BeautifulSoup'
       write_byte(AMF3_XML)
       write_amf3_xml(value)
-    
-    elsif !@non_adaptable.include?(value.class.to_s)
-      if adapter = Adapters.get_adapter_for_result(value)
-        nv = adapter.run(value)
-        write_amf3(nv)
-      else #catch when the res doesn't qualify to be adapted and right an object
-        write_byte(AMF3_OBJECT)
-        vo = VoUtil.get_vo_for_outgoing(value)
-        write_amf3_object(vo)
-      end
-      
+
     elsif value.is_a?(Object)
       write_byte(AMF3_OBJECT)
       vo = VoUtil.get_vo_for_outgoing(value)
