@@ -36,7 +36,7 @@ class Gateway
 		RequestStore.filters_path = File.dirname(__FILE__) + '/filter/'
 		RequestStore.adapters_path = File.dirname(__FILE__) + '/../adapters/'
 		RequestStore.logs_path = File.dirname(__FILE__) + '/../logs/'
-		RequestStore.actions = Array[PrepareAction.new, ClassAction.new, ApplictionInstanceInitAction.new, InvokeAction.new] #create the actions
+		RequestStore.actions = Array[PrepareAction.new, ClassAction.new, ApplictionInstanceInitAction.new, InvokeAction.new, ResultAdapterAction.new] #create the actions  
 		RequestStore.filters = Array[AMFDeserializerFilter.new, RecordsetFormatFilter.new, AuthenticationFilter.new, BatchFilter.new, nd, AMFSerializeFilter.new] #create the filter
 	end
 	
