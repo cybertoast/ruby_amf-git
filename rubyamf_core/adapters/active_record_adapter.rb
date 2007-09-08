@@ -1,7 +1,7 @@
 require 'ostruct'
 
 class ActiveRecordAdapter
-
+  
   #should we use this adapter for the result type
   def use_adapter?(results)
     if(use_multiple?(results) || use_single?(results))

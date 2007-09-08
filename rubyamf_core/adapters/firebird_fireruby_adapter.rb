@@ -1,8 +1,6 @@
 require 'app/amf'
 include RUBYAMF::AMF
 
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 #Firebird - FireRuby
 class FirebirdFirerubyAdapter
 	
