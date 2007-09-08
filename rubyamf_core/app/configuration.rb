@@ -1,3 +1,6 @@
+require 'app/request_store'
+include RUBYAMF::App
+
 #This stores supporting configuration classes used in the config file to register, adapters, vo's, application instances, etc.
 module RUBYAMF
 module Configuration
@@ -47,14 +50,21 @@ end
 
 #Adapters configuration support class
 class Adapters
-  @@adpters = []
+  @@adapters = []
   def Adapters.register(file,classname)
-    @@adpters << [file,classname]
+    @@adapters << [file,classname]
   end
-  
-  def Adapters.get_adapters
-    return @@adpters
-  end
+    
+  def Adapters.get_adapter_for_result(res)
+    @@adapters.each do |adapter|
+      require RequestStore.adapters_path + adapter[0]
+      adapter = Object.const_get(adapter[1]).new
+      if adapter.use_adapter?(res)
+        return adapter
+      end
+    end
+    false
+  end  
 end
 
 #ValueObjects configuration support class
