@@ -69,7 +69,6 @@ class ActiveRecordAdapter
       
       associations = um[0].get_associates
       if(!associations.empty?)
-        #associations = get_associates(um[0])
         #now write the associated models with this AR
         associations.each do |associate|
           na = associate[1, associate.length]
