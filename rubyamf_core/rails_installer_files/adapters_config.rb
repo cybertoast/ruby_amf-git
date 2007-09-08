@@ -29,4 +29,4 @@ Adapters.register('mysql_adapter', 'MysqlAdapter')
 # The result inside of the array would be caught as being adaptable, and therefor run against the active record adapter.
 # This is nice if you're wanting to return multiple sets of results in an array.
 # BE AWARE, THIS SLOWS SERIALIZATION DOWN!
-Adapters.deep_adaptations = true
+Adapters.deep_adaptations = false
