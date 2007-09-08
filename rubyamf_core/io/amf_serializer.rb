@@ -148,6 +148,8 @@ class AMFSerializer
       if adapter = Adapters.get_adapter_for_result(value)
         nv = adapter.run(value)
         write(nv)
+      else
+        write_object(value)
       end
     
 		else
@@ -227,7 +229,8 @@ class AMFSerializer
         write_byte(AMF3_OBJECT)
         vo = VoUtil.get_vo_for_outgoing(value)
         write_amf3_object(vo)
-        
+      end
+      
     elsif value.is_a?(Object)
       write_byte(AMF3_OBJECT)
       vo = VoUtil.get_vo_for_outgoing(value)
@@ -290,7 +293,7 @@ class AMFSerializer
     end
 	end
   
-  def write_amf3_object(value)
+  def write_amf3_object(value)        
 		i = @stored_objects.index(value)
 		if(i != nil)
 		  reference = i << 1
