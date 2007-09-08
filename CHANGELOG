@@ -1,3 +1,6 @@
+--changes 1.3.1
+#added Adapters.deep_adaptations See an adapters_config file for more information.
+
 --changes 1.3 FINAL
 #added more logic for incoming nil/undefined/empty associated active_record model data. Was a few cases when it wouldn't work correctly (see util/active_record#update_nil_associations)
 #add util/active_record#update_nans which updates any hash values that are NaN, turns them into nil
