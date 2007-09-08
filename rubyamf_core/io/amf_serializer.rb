@@ -1,10 +1,12 @@
 require 'app/amf'
+require 'app/configuration'
 require 'date'
 require 'io/read_write'
 require 'ostruct'
-require 'util/vo_util'
 require 'rexml/document'
+require 'util/vo_util'
 include RUBYAMF::AMF
+include RUBYAMF::Configuration
 
 module RUBYAMF
 module IO
@@ -18,6 +20,9 @@ class AMFSerializer
 	def rubyamf_write(amfobj)
 	  @amfobj = amfobj
 		@stream = @amfobj.output_stream #grab the output stream for the amfobj
+		@non_adaptable = ['Array','Hash','String', 'Integer','Fixnum','Bignum',
+		'Float','Numeric','NilClass','ASRecordset', 'AS3DataProvider','TrueClass',
+		'FalseClass','Date','Time','DateTime']
 	  serialize
 	end
 
@@ -135,13 +140,16 @@ class AMFSerializer
 
 		elsif (value.instance_of?(REXML::Document))
 			write_xml(value.write.to_s)
-      
-		elsif (value.respond_to?(:to_xml))
-			write_xml(value.to_xml)
 			
 		elsif (value.class.to_s == 'BeautifulSoup')
       write_xml(value.to_s)
-      
+                
+    elsif !@non_adaptable.include?(value.class.to_s)
+      if adapter = Adapters.get_adapter_for_result(value)
+        nv = adapter.run(value)
+        write(nv)
+      end
+    
 		else
 			write_object(value)
 		end
@@ -151,7 +159,6 @@ class AMFSerializer
   def write_amf3(value)
     if(value.nil?)
       write_byte(AMF3_NULL)
-      #AMF3_UNDEFINED, no outgoing type of undefined is currently supported, as ruby doesn't have undefined
     
     elsif (value.is_a?(TrueClass) || value.is_a?(FalseClass))
       if(value == true)
@@ -207,15 +214,20 @@ class AMFSerializer
 		elsif (value.is_a?(REXML::Document))
       write_byte(AMF3_XML)
       write_amf3_xml(value)
-    
-		elsif (value.respond_to?(:to_xml))
-		  write_byte(AMF3_XML)
-			write_amf3_xml(value.to_xml)
-    
+        
     elsif value.class.to_s == 'BeautifulSoup'
       write_byte(AMF3_XML)
       write_amf3_xml(value)
     
+    elsif !@non_adaptable.include?(value.class.to_s)
+      if adapter = Adapters.get_adapter_for_result(value)
+        nv = adapter.run(value)
+        write_amf3(nv)
+      else #catch when the res doesn't qualify to be adapted and right an object
+        write_byte(AMF3_OBJECT)
+        vo = VoUtil.get_vo_for_outgoing(value)
+        write_amf3_object(vo)
+        
     elsif value.is_a?(Object)
       write_byte(AMF3_OBJECT)
       vo = VoUtil.get_vo_for_outgoing(value)
