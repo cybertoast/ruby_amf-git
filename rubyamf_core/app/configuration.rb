@@ -1,7 +1,4 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 #This stores supporting configuration classes used in the config file to register, adapters, vo's, application instances, etc.
-
 module RUBYAMF
 module Configuration
 
@@ -48,7 +45,7 @@ class Application
   end
 end
 
-#Global adapters configuration support class
+#Adapters configuration support class
 class Adapters
   @@adpters = []
   def Adapters.register(file,classname)
@@ -114,8 +111,6 @@ class ValueObjects
   def ValueObjects.rails_parameter_mapping_type
     @@mapping_type
   end
-  
 end
-
 end
 end

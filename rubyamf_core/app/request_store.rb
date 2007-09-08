@@ -1,5 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 module RUBYAMF
 module App
 
@@ -34,15 +32,13 @@ class RequestStore
   @reload_services = false
   @config_path
   @app_instance
-  
-  #Rails Specific Members
   @rails_request
   @rails_response
 
 	class << self
 	  attr_accessor :actions
 	  attr_accessor :filters
-	  attr_accessor :client #0 flash player , #1 flash comm
+	  attr_accessor :client
 	  attr_accessor :service_path
 	  attr_accessor :gateway_path
 	  attr_accessor :actions_path
@@ -67,8 +63,6 @@ class RequestStore
 	  attr_accessor :auth_header
 	  attr_accessor :config_path
 	  attr_accessor :app_instance
-	  
-	  #Rails Specific Members
 	  attr_accessor :reload_services
 	  attr_accessor :rails_request
 	  attr_accessor :rails_response

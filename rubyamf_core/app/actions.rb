@@ -1,5 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 require 'app/request_store'
 require 'app/configuration'
 require 'exception/rubyamf_exception'
@@ -51,7 +49,7 @@ class PrepareAction
   end    
 end
 
-#Loads the file that contains the service method you are calling
+#Loads the file that contains the service method you are calling.
 class ClassAction
 	def run(amfbody)
 	  if amfbody.exec == false
@@ -368,10 +366,9 @@ class RailsInvokeAction
 end
 
 
-#this class takes the amfobj's results (if a db result) and adapts it to a flash recordset
+#This class qualifies a service result to be adapted into something else. Usually DB related.
 class ResultAdapterAction
-  #include Adapters #include the module that defines what adapters to test for
-  
+
 	def run(amfbody)
     new_results = '' #for some reason this has to be initialized here.. not sure why
 		if amfbody.special_handling == 'RemotingMessage'

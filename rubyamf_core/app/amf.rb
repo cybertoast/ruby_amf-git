@@ -1,5 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 require 'ostruct'
 require 'exception/rubyamf_exception'
 include RUBYAMF::Exceptions

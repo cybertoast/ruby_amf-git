@@ -1,4 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 class ActiveRecord::Base
 
   #This member, and the "single" methods are used for ActiveRecord#as_single!
@@ -95,7 +94,7 @@ class ActiveRecord::Base
         
         elsif ass.macro == :has_many
           if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
-            hash[n] = []         
+            hash[n] = []
           end                                        
 
         elsif ass.macro == :has_and_belongs_to_many

@@ -1,4 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 #This class extends ActionController::Base
 class ActionController::Base
   

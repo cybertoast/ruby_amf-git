@@ -1,4 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
 require 'app/configuration'
 class Object
   
@@ -17,5 +16,4 @@ class Object
     members = obj.instance_variables.map{|mem| mem[1,mem.length]}
     members
   end
-    
 end

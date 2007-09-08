@@ -1,5 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 #utility method to get a vo object mapping from the vo_mappings module
 require 'app/configuration'
 require 'app/request_store'

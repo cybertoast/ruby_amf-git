@@ -1,7 +1,7 @@
 require 'app/amf'
 include RUBYAMF::AMF
 
-# Adapt a Sqlite result into an ASRecordSet
+#Adapt a Sqlite result into an ASRecordSet
 class SqliteAdapter
 	
 	def use_adapter?(result)

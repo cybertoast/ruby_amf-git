@@ -1,5 +1,3 @@
-#Copyright (c) 2007 Aaron Smith (aaron@rubyamf.org) - MIT License
-
 require 'app/request_store'
 require 'app/amf'
 require 'app/actions'
@@ -7,12 +5,12 @@ require 'app/filters'
 require 'app/configuration'
 require 'exception/exception_handler'
 require 'ostruct'
-require 'util/object' #Include Object stuff here.
-require 'util/openstruct' #Include Object stuff here.
+require 'util/object'
+require 'util/openstruct'
 require 'util/string'
 require 'util/log'
 require 'util/net_debug'
-require 'util/active_record' #Include active record updates
+require 'util/active_record'
 require 'logger'
 require 'zlib'
 include RUBYAMF::Actions
@@ -26,7 +24,7 @@ include RUBYAMF::Util
 module RUBYAMF
 module App
 
-#the rubyamf gateway. all requests circulate through this classes __service__ method
+#the rubyamf gateway. all requests circulate through this classes service method
 class Gateway
 	
 	#creates a new gateway instance
@@ -44,7 +42,7 @@ class Gateway
 	
 	#all get and post requests circulate throught his method
 	def service(raw)
-	  app_config #run configuration script
+	  app_config #run configuration scripts
 		amfobj = AMFObject.new(raw)
 		filter_chain = FilterChain.new
 		filter_chain.run(amfobj)
