@@ -12,11 +12,15 @@ module Actions
 #This sets up each body for processing
 class PrepareAction
   def run(amfbody)
-    RequestStore.flex_messaging = false #reset to false
-    if RequestStore.amf_encoding == 'amf3' #AMF3
+    #First setup everything for AMF0, will potentially be altered for AMF3 in the proceeding code.
+    amfbody.set_amf0_class_file_and_uri
+    amfbody.set_amf0_service_and_method
+    
+    RequestStore.flex_messaging = false #reset to false to ensure that further requests get a fair chance at being something other than Flex messaging.
+    if RequestStore.amf_encoding == 'amf3'
       tmp_val = amfbody.value[0]
       if tmp_val.is_a?(OpenStruct)
-        if tmp_val._explicitType == 'flex.messaging.messages.RemotingMessage' #Flex Messaging setup
+        if tmp_val._explicitType == 'flex.messaging.messages.RemotingMessage' #Flex messaging setup
           RequestStore.flex_messaging = true
   				amfbody.special_handling = 'RemotingMessage'
   				amfbody.value = tmp_val.body
@@ -27,24 +31,13 @@ class PrepareAction
           amfbody.service_method_name = tmp_val.operation
           amfbody._explicitType = 'flex.messaging.messages.RemotingMessage'
   				amfbody.set_amf3_class_file_and_uri
-        elsif tmp_val._explicitType == 'flex.messaging.messages.CommandMessage' #it's a ping, don't process this body
-          if tmp_val.operation == 5
-            amfbody.exec = false
-            amfbody.special_handling = 'Ping'
-    				amfbody.set_meta('clientId', tmp_val.clientId)
-    				amfbody.set_meta('messageId', tmp_val.messageId)
-    			end
-        else #is amf3, but set these props the same way as amf0, and not flex
-          amfbody.set_amf0_class_file_and_uri
-          amfbody.set_amf0_service_and_method
+        elsif tmp_val._explicitType == 'flex.messaging.messages.CommandMessage' && tmp_val.operation == 5 #it's a ping, don't process this body
+          amfbody.exec = false
+          amfbody.special_handling = 'Ping'
+  				amfbody.set_meta('clientId', tmp_val.clientId)
+  				amfbody.set_meta('messageId', tmp_val.messageId)
         end
-      else #is amf3, but set these props the same way as amf0, and not flex
-        amfbody.set_amf0_class_file_and_uri
-        amfbody.set_amf0_service_and_method
       end
-    elsif RequestStore.amf_encoding == 'amf0' #AMF0
-      amfbody.set_amf0_class_file_and_uri
-      amfbody.set_amf0_service_and_method
     end    
   end    
 end
