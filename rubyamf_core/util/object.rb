@@ -16,4 +16,14 @@ class Object
     members = obj.instance_variables.map{|mem| mem[1,mem.length]}
     members
   end
+  
+  def to_hash
+    hash = {}
+    members = self.get_members
+    members.each do |k|
+      val = self.send(:"#{k}")
+      hash[k] = val
+    end
+    hash
+  end
 end
