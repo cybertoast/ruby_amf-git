@@ -329,18 +329,37 @@ class RailsInvokeAction
 		if @amfbody.value.empty? || @amfbody.value.nil?
 		  @service.process(req,res)
 		else
-		  @amfbody.value.each_with_index do |item,i|
-		    if item.class.superclass.to_s == 'ActiveRecord::Base'
+		  if @amfbody.value.length == 1
+		    item = @amfbody.value[0]
+		    if item.class.superclass.to_s == 'ActiveRecord::Base' #if AR VO
+          hash = item.to_update_hash
           if ValueObjects.rails_parameter_mapping_type == 'active_record'
-            req.parameters[item.class.to_s.downcase] = item
+            req.parameters[item.class.to_s.downcase.to_sym] = item
           else
-		        req.parameters[item.class.to_s.downcase] = item.to_update_hash
+		        req.parameters[item.class.to_s.downcase.to_sym] = hash
+		        req.parameters.merge!(hash)
 		      end
-		    elsif !item._explicitType.nil?
+		    elsif !item._explicitType.nil? #if a custom / generic VO
+		      hash = item.to_hash
   		    req.parameters[item._explicitType.to_sym] = item
-		    else
-		      req.parameters[i] = item
+  		    req.parameters.merge!(hash)
 		    end
+		    #always put each parameter in the index of the parameter
+		    req.parameters[i] = item
+		  else
+		    @amfbody.value.each_with_index do |item,i|
+  		    if item.class.superclass.to_s == 'ActiveRecord::Base'
+            if ValueObjects.rails_parameter_mapping_type == 'active_record'
+              req.parameters[item.class.to_s.downcase] = item
+            else
+  		        req.parameters[item.class.to_s.downcase] = item.to_update_hash
+  		      end
+  		    elsif !item._explicitType.nil?
+    		    req.parameters[item._explicitType.to_sym] = item
+  		    end
+  		    #always put each parameter in the index of the parameter
+  		    req.parameters[i] = item
+        end
       end
 	    @service.process(req,res)
     end
