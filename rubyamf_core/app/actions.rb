@@ -385,9 +385,7 @@ class RailsInvokeAction
 end
 
 #this class takes the amfobj's results (if a db result) and adapts it to a flash recordset
-class ResultAdapterAction
-  #include Adapters #include the module that defines what adapters to test for
-  
+class ResultAdapterAction  
 	def run(amfbody)
 	  #If you opted in for deep adaptation attempts don't do anything here, it will all be handled in the serializer
 	  if Adapters.deep_adaptations
