@@ -17,13 +17,11 @@ class VoUtil
       
       vo = nil
       vomap = nil
-      active_rec = false
       mappings.each do |map|
         if map[:incoming] == classname
           vomap = map #store vomap
-          if map[:type] != nil && map[:type] == 'active_record'
-            vo = self.get_active_record_from_open_struct(os)
-            active_rec = true
+          if map[:type].to_s == 'active_record'
+            vo = os
             break
           else
             filepath = map[:map_to].split('.').join('/').to_s + '.rb' #set up filepath from the map_to symbol
@@ -32,12 +30,7 @@ class VoUtil
             break
           end
         end
-      end
-      
-      #if this was an active record VO, return it prematurely
-      if active_rec
-        return vo
-      end
+      end      
       
       #vo wasn't created, just return the open struct
       if vo == nil
@@ -93,7 +86,8 @@ class VoUtil
     end
     nil
   end
-  
+
+=begin
   #make an init hash for AR from an open struct
   def self.make_hash_for_active_record_from_open_struct(os)
     hash = {}
@@ -126,4 +120,5 @@ class VoUtil
     ar = Object.const_get(classname).new(hash)
     return ar
   end
+=end
 end
