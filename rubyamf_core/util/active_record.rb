@@ -1,5 +1,5 @@
 class ActiveRecord::Base
-
+  
   #This member, and the "single" methods are used for ActiveRecord#as_single!
   #which causes RubyAMF to write just an object to the stream, instead of wrapping
   #the object in an array.
@@ -56,7 +56,7 @@ class ActiveRecord::Base
   end
   
   #turn this ActiveRecord into an update hash
-  def to_update_hash
+  def to_hash
     o = {}
     column_names = self.get_column_names
     
