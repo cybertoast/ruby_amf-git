@@ -331,10 +331,10 @@ class RailsInvokeAction
 		else
 		  @amfbody.value.each_with_index do |item,i|
 		    if item.class.superclass.to_s == 'ActiveRecord::Base'
-          if ValueObjects.rails_parameter_mapping_type == 'active_record'
+          if ValueObjects.rails_parameter_mapping_type.to_s == 'active_record'
             req.parameters[item.class.to_s.downcase] = item
           else
-		        req.parameters[item.class.to_s.downcase] = item.to_update_hash
+		        req.parameters[item.class.to_s.downcase] = item.to_hash
 		      end
 		    elsif !item._explicitType.nil?
   		    req.parameters[item._explicitType.to_sym] = item
