@@ -45,8 +45,8 @@ class PrepareAction
     elsif RequestStore.amf_encoding == 'amf0' #AMF0
       amfbody.set_amf0_class_file_and_uri
       amfbody.set_amf0_service_and_method
-    end
-  end
+    end    
+  end    
 end
 
 #Loads the file that contains the service method you are calling.
@@ -329,14 +329,18 @@ class RailsInvokeAction
 		if @amfbody.value.empty? || @amfbody.value.nil?
 		  @service.process(req,res)
 		else
-	    @amfbody.value.each_with_index do |item,i|
-		    if !item._explicitType.nil?
-		      hash = item.to_hash
-  		    req.parameters[item._explicitType.downcase.to_sym] = hash
-  		    req.parameters.merge!(hash)
+		  @amfbody.value.each_with_index do |item,i|
+		    if item.class.superclass.to_s == 'ActiveRecord::Base'
+          if ValueObjects.rails_parameter_mapping_type == 'active_record'
+            req.parameters[item.class.to_s.downcase] = item
+          else
+		        req.parameters[item.class.to_s.downcase] = item.to_update_hash
+		      end
+		    elsif !item._explicitType.nil?
+  		    req.parameters[item._explicitType.to_sym] = item
+		    else
+		      req.parameters[i] = item
 		    end
-		    #always put each parameter in the index of the parameter
-		    req.parameters[i] = item
       end
 	    @service.process(req,res)
     end
@@ -362,7 +366,9 @@ class RailsInvokeAction
 end
 
 #this class takes the amfobj's results (if a db result) and adapts it to a flash recordset
-class ResultAdapterAction  
+class ResultAdapterAction
+  #include Adapters #include the module that defines what adapters to test for
+  
 	def run(amfbody)
 	  #If you opted in for deep adaptation attempts don't do anything here, it will all be handled in the serializer
 	  if Adapters.deep_adaptations
