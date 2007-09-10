@@ -330,14 +330,32 @@ class RailsInvokeAction
 		  @service.process(req,res)
 		else
 		  @amfbody.value.each_with_index do |item,i|
-		    if item.class.superclass.to_s == 'ActiveRecord::Base'
-          if ValueObjects.rails_parameter_mapping_type.to_s == 'active_record'
-            req.parameters[item.class.to_s.downcase] = item
-          else
-		        req.parameters[item.class.to_s.downcase] = item.to_hash
+		    
+		    #if the first parameter has an "id"
+		    if i < 2 && (item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct')
+		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
+		        req.parameters[:id] = item.id
 		      end
+		    end
+		    
+		    if item.class.superclass.to_s == 'ActiveRecord::Base'
+          req.parameters.merge!(item.original_vo_from_deserialization.to_hash) #merge in properties into the params hash
+          if i < 2 && (item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct')
+            #have to specifically check for id here, as it doesn't show up in any object members.
+            if item.original_vo_from_deserialization.id != nil
+              #This will override the above params[:id] attempt, because it's the original deserialized values.
+              req.parameters[:id] = item.original_vo_from_deserialization.id
+            end
+          end
+	        req.parameters[item.class.to_s.downcase.to_sym] = item.original_vo_from_deserialization.to_hash
+	        
 		    elsif !item._explicitType.nil?
   		    req.parameters[item._explicitType.to_sym] = item
+  		    if item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct'
+  		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
+  		        req.parameters[:id] = item.id
+  		      end
+  		    end
 		    else
 		      req.parameters[i] = item
 		    end

@@ -123,7 +123,14 @@ class VoUtil
     hash = self.make_hash_for_active_record_from_open_struct(os)
     ActiveRecord::Base.update_nil_associations(Object.const_get(classname),hash) #update the hash so nil assotiations don't mess up AR
     ActiveRecord::Base.update_nans(hash)
-    ar = Object.const_get(classname).new(hash)
+    if os.id != 0 && os.id.to_s != 'NaN' && os.id != nil
+      ar = Object.const_get(classname).find(os.id)
+    else
+      ar = Object.const_get(classname).new(hash)
+    end
+    
+    #store the original vo for later, (in the RailsInvokeAction)
+    ar.original_vo_from_deserialization = os
     return ar
   end
 end
