@@ -332,7 +332,7 @@ class RailsInvokeAction
 		  @amfbody.value.each_with_index do |item,i|
 		    
 		    #if the first parameter has an "id"
-		    if i < 2 && (item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct')
+		    if i < 1 && (item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct')
 		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
 		        req.parameters[:id] = item.id
 		      end
@@ -340,7 +340,7 @@ class RailsInvokeAction
 		    
 		    if item.class.superclass.to_s == 'ActiveRecord::Base'
           req.parameters.merge!(item.original_vo_from_deserialization.to_hash) #merge in properties into the params hash
-          if i < 2 && (item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct')
+          if i < 1 && (item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct')
             #have to specifically check for id here, as it doesn't show up in any object members.
             if item.original_vo_from_deserialization.id != nil
               #This will override the above params[:id] attempt, because it's the original deserialized values.
