@@ -53,7 +53,7 @@ class RubyamfController < ActionController::Base
 			#if your using Flash 9 with Flash Remoting the format needs to be 'fl9'
 			#if your useing Flash 8 with Flash Remogin the format needs to be 'fl8'
 			#Flex FDS RemoteObject is handled nativly. No need to adjust the format for that.
-			gateway.recordset_format = 'fl8' #OR 'fl9'
+			gateway.recordset_format = 'fl9' #OR 'fl8'
 			#Note: You can use netConnection.addHeader to change this from Flash instead.
 			#service.addHeader('recordset_format',false,'fl9');
 			#service.addHeader('recordset_format',false,'fl8')
