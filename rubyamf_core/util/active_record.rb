@@ -1,10 +1,10 @@
 class ActiveRecord::Base
   
-  #this holds the original ValueObject from deserialization time, as when an incoming VO with an 'id' property
-  #on it is found, it is 'found' (Model.find(id)) from the DB. So right before the params hash is updated
-  #for the rails request, I slip in this original object so you can do an "update_attributes(params[:model])"
-  #and the correct values will be used.
-  @original_vo_from_deserialization
+  #This holds the original incoming Value Object from deserialization time, as when an incoming VO with an 'id' property
+  #on it is found, it is 'found' (Model.find(id)) in the DB (instead of Model.new(hash)). So right before the params hash
+  #is updated for the rails request, I slip in this original object so you can do an "update_attributes(params[:model])"
+  #and the correct 'update' values will be used.
+  attr_accessor :original_vo_from_deserialization
   
   #This member, and the "single" methods are used for ActiveRecord#as_single!
   #which causes RubyAMF to write just an object to the stream, instead of wrapping
