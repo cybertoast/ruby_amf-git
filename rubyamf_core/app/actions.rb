@@ -349,12 +349,12 @@ class RailsInvokeAction
 		        t = t.split('.').last.downcase.to_s
 		      end
   		    req.parameters[t.to_sym] = item
-  		    if item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct'
-  		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
-  		        req.parameters[:id] = item.id
-  		      end
-  		    end
   		    if i < 1
+  		      if item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct'
+    		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
+    		        req.parameters[:id] = item.id
+    		      end
+    		    end
   		      req.parameters.merge!(item.to_hash)
   		    end
   		    
