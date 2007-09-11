@@ -342,7 +342,11 @@ class RailsInvokeAction
 	        req.parameters[item.class.to_s.downcase.to_sym] = item.original_vo_from_deserialization.to_hash
 	        
 		    elsif !item._explicitType.nil?
-  		    req.parameters[item._explicitType.to_sym] = item
+		      t = item._explicitType
+		      if t.include?('.')
+		        t = t.split('.').last.downcase.to_s
+		      end
+  		    req.parameters[t.to_sym] = item
   		    if item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct'
   		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
   		        req.parameters[:id] = item.id
