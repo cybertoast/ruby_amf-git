@@ -12,7 +12,7 @@ class Object
     hash= {}
     members = self.get_members
     members.each do |m|
-      hash[m] = self.send(:"#{k}")
+      hash[m] = eval("self.#{m}")
     end
     if !self.id.nil?
       hash['id'] = self.id
