@@ -11,7 +11,7 @@ class ActionController::Base
     return RequestStore.rails_authentication
   end
   
-  def render(options = nil, deprecated_status = nil, &block) #:doc:    
+  def render(options = nil, deprecated_status = nil, &block)
     raise DoubleRenderError, "Can only render or redirect once per action" if performed?
     if options.nil?
       if self.rubyamf_attempt_file_render
