@@ -81,4 +81,14 @@ class RubyamfController < ActionController::Base
 	    STDOUT.puts e.backtrace
 	  end
   end
+  
+  
+  def rescue_action(e)
+    #There are a couple things that will trigger this rescue_action. Which aren't
+    #ever returned to the flash player. be ware. but I will put a fix for this in.
+    puts "/rubyamf/gateway/render_action"
+    puts e.message
+    puts e.backtrace
+  end
+  
 end
