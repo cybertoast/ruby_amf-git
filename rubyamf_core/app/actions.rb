@@ -359,10 +359,10 @@ class RailsInvokeAction
   		    end
   		    
   		  elsif item.class.to_s == 'OpenStruct' || item.class.to_s == "Object"
-  		    if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
-		        req.parameters[:id] = item.id
-		      end
 		      if i < 1
+  		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
+  		        req.parameters[:id] = item.id
+  		      end
   		      req.parameters.merge!(item.to_hash)
   		    end  		    
 		    end
