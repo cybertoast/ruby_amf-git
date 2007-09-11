@@ -330,7 +330,9 @@ class RailsInvokeAction
 		  @service.process(req,res)
 		else
 		  @amfbody.value.each_with_index do |item,i|		    
+		    req.parameters[i] = item
 		    if item.class.superclass.to_s == 'ActiveRecord::Base'
+		      req.parameters[i] = item.original_vo_from_deserialization.to_hash
           if i < 1 #Only the first parameter will be 
             req.parameters.merge!(item.original_vo_from_deserialization.to_hash) #merge in properties into the params hash
             #have to specifically check for id here, as it doesn't show up in any object members.
@@ -362,10 +364,7 @@ class RailsInvokeAction
 		      end
 		      if i < 1
   		      req.parameters.merge!(item.to_hash)
-  		    end
-  		    
-		    else
-		      req.parameters[i] = item
+  		    end  		    
 		    end
       end
 	    @service.process(req,res)
