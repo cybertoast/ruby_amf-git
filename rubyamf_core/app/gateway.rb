@@ -1,4 +1,4 @@
-#assign NaN
+#initialize
 require 'bigdecimal'
 NaN = BigDecimal.new("NaN")
 
