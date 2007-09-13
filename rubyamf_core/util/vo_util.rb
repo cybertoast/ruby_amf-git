@@ -130,8 +130,13 @@ class VoUtil
         ar = Object.const_get(classname).find(os.id)
         if os.created_at == nil
           os.delete_field('created_at')
-        elsif os.updated_at == nil
-          os.delete_field('updated_at')
+        end
+        os.delete_field('updated_at') #always delete any updated_at fields, let AR put in the updated at
+        os.get_members.each do |k| #go through each value in the object, if it's nil don't put it in the update hash
+          val = os.send(:"#{k}")
+          if val == nil || val == NaN
+            os.delete_field(k)
+          end
         end
       else
         ar = Object.const_get(classname).new(hash)
