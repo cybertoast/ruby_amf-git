@@ -1,7 +1,17 @@
 class OpenStruct
   
   def get_members
+    if self.rmembers != nil
+      if self.id != nil
+        self.rmembers << 'id'
+      end
+      return self.rmembers
+    end
+    
     members = self.marshal_dump.keys.map{|k| k.to_s}
+    if self.id != nil
+      members << 'id'
+    end
     members
   end
   

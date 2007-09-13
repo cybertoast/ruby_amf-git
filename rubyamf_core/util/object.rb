@@ -4,7 +4,17 @@ class Object
   attr_accessor :id
     
   def get_members
+    if self.rmembers != nil
+      if self.id != nil
+        self.rmembers << 'id'
+      end
+      return self.rmembers
+    end
+    
     members = obj.instance_variables.map{|mem| mem[1,mem.length]}
+    if self.id != nil
+      members << 'id'
+    end
     members
   end
   
