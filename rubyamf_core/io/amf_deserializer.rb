@@ -133,8 +133,7 @@ class AMFDeserializer
 	end
   
   #Reads object data by type from @input_stream
-	def read(type)
-	  	  
+	def read(type)	  
     #for amf unit tests or raw amf data
     if @raw == true && @rawkickoff == true #rawkickoff is a flag so that the initial type is never read again
       type = read_byte
@@ -459,7 +458,7 @@ class AMFDeserializer
   
   #AMF0	
 	def read_number
- 		read_double
+    read_double
  	end
 
  	def read_booleanr
