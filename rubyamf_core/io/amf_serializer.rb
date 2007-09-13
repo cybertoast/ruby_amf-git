@@ -115,7 +115,15 @@ class AMFSerializer
 		
 		elsif value.to_s == 'NaN' && value.object_id == NaN.object_id
       write_number(value.to_f)
-		      
+		
+    elsif value.to_s == 'Infinity' && value.object_id == Infinity.object_id
+      write_byte(0x05)
+      write_double(value.to_f)
+    
+    elsif value.to_s == "-Infinity" && value.object_id == NInfinity.object_id
+      write_byte(0x05)
+      write_double(value.to_f)
+          
 		elsif value.nil?
 			write_null
     
@@ -181,6 +189,14 @@ class AMFSerializer
     end
     
     if value.to_s == 'NaN' && value.object_id == NaN.object_id
+      write_byte(0x05)
+      write_double(value.to_f)
+    
+    elsif value.to_s == 'Infinity' && value.object_id == Infinity.object_id
+      write_byte(0x05)
+      write_double(value.to_f)
+    
+    elsif value.to_s == "-Infinity" && value.object_id == NInfinity.object_id
       write_byte(0x05)
       write_double(value.to_f)
     

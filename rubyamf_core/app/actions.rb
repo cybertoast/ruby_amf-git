@@ -46,7 +46,7 @@ class PrepareAction
       amfbody.set_amf0_class_file_and_uri
       amfbody.set_amf0_service_and_method
     end    
-  end    
+  end  
 end
 
 #Loads the file that contains the service method you are calling.

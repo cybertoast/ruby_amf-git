@@ -1,7 +1,3 @@
-#initialize
-require 'bigdecimal'
-NaN = BigDecimal.new("NaN")
-
 require 'app/request_store'
 require 'app/amf'
 require 'app/actions'
@@ -15,6 +11,7 @@ require 'util/string'
 require 'util/log'
 require 'util/net_debug'
 require 'util/active_record'
+require 'util/bigdecimal'
 require 'logger'
 require 'zlib'
 include RUBYAMF::Actions

@@ -242,6 +242,10 @@ class AMFDeserializer
     		result |= 0xe0000000
     	end
     end
+    
+    if result.to_s == '-Infinity'
+	    return NInfinity
+	  end
     return result
   end
   
@@ -458,7 +462,11 @@ class AMFDeserializer
   
   #AMF0	
 	def read_number
-    read_double
+	  res = read_double
+	  if res.to_s == '-Infinity'
+	    return NInfinity
+	  end
+	  res
  	end
 
  	def read_booleanr
