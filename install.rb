@@ -15,7 +15,7 @@ begin
     File.open("./config/rubyamf/vo_config.rb","r") do |f|
       while line = f.gets
         if line.match(/rails_parameter_hash_mapping/)
-          continue
+          next
         else
           fc << line
         end
