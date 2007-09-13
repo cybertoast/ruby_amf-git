@@ -120,8 +120,7 @@ class AMFSerializer
 			write_null
     
     elsif value.is_a?(BigDecimal)
-      value = value.to_s('F').to_f #this is turning a string into a Ruby Float, but because there are no further operations on it it is safe
-      write_number(value)
+      write_number(value.to_f)
     
     elsif (value.is_a?(Float))
 			write_number(value)
