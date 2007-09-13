@@ -13,8 +13,7 @@
 #took out ValueObjects.rails_parameter_mapping_type. It is always 'update_hash', not really needed anymore.
 #changed recordset_format default to be FL9
 #Handled bug with Date/Time/DateTime not writing as correct reference to other Date's in the AMF stream, (if the same date was being returned, it would write a reference, but writing references to dates does not work correctly in the player)
-
-#fixed final friggin 'id' property problems. All id attributes come through correctly now.
+#fixed final friggin 'id' property problems. All id attributes come through correctly now, (both ways).
 
 --changes 1.3.1
 #added Adapters.deep_adaptations See an adapters_config file for more information.
