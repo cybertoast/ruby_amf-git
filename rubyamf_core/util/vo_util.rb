@@ -128,6 +128,11 @@ class VoUtil
     begin
       if os.id != 0 && os.id.to_s != 'NaN' && os.id != nil
         ar = Object.const_get(classname).find(os.id)
+        if os.created_at == nil
+          os.delete_field('created_at')
+        elsif os.updated_at == nil
+          os.delete_field('updated_at')
+        end
       else
         ar = Object.const_get(classname).new(hash)
       end
