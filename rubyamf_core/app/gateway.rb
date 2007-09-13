@@ -1,3 +1,7 @@
+#assign NaN
+require 'bigdecimal'
+NaN = BigDecimal.new("NaN")
+
 require 'app/request_store'
 require 'app/amf'
 require 'app/actions'
