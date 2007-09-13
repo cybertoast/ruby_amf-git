@@ -1,9 +1,17 @@
 --changes 1.3.2
+#added AMF0 / AMF3 NaN support ("NaN" constant in ruby)
+#added AMF3 Infinity support ("Infinity" constant in ruby)
+#added AMF3 -Infinity support ("NInfinity" constant in ruby)
+#added BigDecimal support
+#added isNaN Top Level function (has alias of isNaN?)
+#added isFinite Top Level function (has alias of isFinite?)
 #added some better logic for incoming VO -> params[:] mapping. Now the first incoming VO properties get merged into the params hash. Thus params[:id] will work. (enabling update,edit,destroy scaffolding methods)
-#added rescue_action in the rubyamf_controller, to rescue a few cases where exceptions couldn't be returned back to the player. This fixes that and all exceptions are now returned to the player.
+#put a rescue_action in the rubyamf_controller. This needs to be piped back to flash yet. This is the only case where exceptions can't get returned to the player.
 #took out ValueObjects.rails_parameter_mapping_type. It is always 'update_hash', not really needed anymore.
 #changed recordset_format default to be FL9
+#Handled bug with Date/Time/DateTime not writing as correct reference to other Date's in the AMF stream, (if the same date was being returned, it would write a reference, but writing references to dates does not work correctly in the player)
 
+#fixed final friggin 'id' property problems. All id attributes come through correctly now.
 
 --changes 1.3.1
 #added Adapters.deep_adaptations See an adapters_config file for more information.
