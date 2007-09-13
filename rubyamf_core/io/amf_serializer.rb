@@ -102,7 +102,7 @@ class AMFSerializer
         end
       end
     end
-      
+    
 	  if value.is_a?(ASRecordset) && (RequestStore.recordset_format == 'fl9' || RequestStore.recordset_format == 'fl.data.DataProvider')
 	    write_data_provider(value)
 	  
@@ -112,6 +112,9 @@ class AMFSerializer
 		  		
 		elsif value.is_a?(ASRecordset)
 		  write_recordset(value)
+		
+		elsif value.to_s == 'NaN' && value.object_id == NaN.object_id
+      write_number(value.to_f)
 		      
 		elsif value.nil?
 			write_null
