@@ -27,7 +27,7 @@ class VoUtil
             break
           else
             filepath = map[:map_to].split('.').join('/').to_s + '.rb' #set up filepath from the map_to symbol
-            require RUBYAMF_VO + '/' + filepath #require the file
+            load(RUBYAMF_VO + '/' + filepath) #require the file
             vo = Object.const_get(classname.split('.').last).new #this returns an instance of the VO
             break
           end
