@@ -255,9 +255,12 @@ class AMFDeserializer
     if isReference
       reference = type >> 1
       if reference < @stored_strings.length
+        if @stored_strings[reference] == nil
+          raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant string at index #{reference}, please tell aaron@rubyamf.org"))
+        end
         return @stored_strings[reference]
       else
-        raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_STRING_REFERENCE_ERROR, "Undefined string reference when deserialing AMF3 data, reference index was: #{reference}") )
+        raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_STRING_REFERENCE_ERROR, "Reference to non existant string at index #{reference}, please tell aaron@rubyamf.org") )
       end
     else
       
@@ -271,9 +274,6 @@ class AMFDeserializer
       if length > 0
         str = String.new(readn(length)) #specifically cast as string, as we're reading verbatim from the stream
         str.toutf8 #convert to utf8
-        if @stored_strings.nil?
-          @stored_strings = []
-        end
         @stored_strings << str
       end
       return str
@@ -285,13 +285,13 @@ class AMFDeserializer
   	isReference = (type & 0x01) == 0
   	if isReference
   	  reference = type >> 1
+  		if @stored_objects[reference] == nil
+  		  raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant xml string at index #{reference}, please tell aaron@rubyamf.org"))
+  		end
   		xml = @stored_objects[reference]
   	else
       length = type >> 1
   		xml = readn(length)
-  	end
-  	if @stored_objects.nil?
-  	  @stored_objects = []
   	end
   	@stored_objects << xml
   	return xml
@@ -303,6 +303,9 @@ class AMFDeserializer
     if isReference
       reference = type >> 1
       if reference < @stored_objects.length
+        if @stored_objects[reference] == nil
+          raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant date at index #{reference}, please tell aaron@rubyamf.org"))
+        end
         return @stored_objects[reference]
       else
         raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Undefined date object reference when deserialing AMF3: #{reference}") )
@@ -323,9 +326,12 @@ class AMFDeserializer
     if isReference
       reference = type >> 1
       if reference < @stored_objects.length
+        if @stored_objects[reference] == nil
+          raise(RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant array at index #{reference}, please tell aaron@rubyamf.org"))
+        end
         return @stored_objects[reference]
       else
-        raise Exception.new("Reference to non-existent object: #{reference}")
+        raise Exception.new("Reference to non-existent array at index #{reference}, please tell aaron@rubyamf.org")
       end
     else
       length = type >> 1
@@ -365,6 +371,9 @@ class AMFDeserializer
     if isReference
       reference = type >> 1
       if reference < @stored_objects.length
+        if @stored_objects[reference] == nil
+          raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant object at index #{reference}, please tell aaron@rubyamf.org."))
+        end
         return @stored_objects[reference]
       else
 			  raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant object #{reference}"))
@@ -393,9 +402,10 @@ class AMFDeserializer
         0.upto(memberCount - 1) do
           classMembers << read_amf3_string
         end
-    
+      
         classDefinition = {"type" => className, "members" => classMembers, "externalizable" => externalizable, "dynamic" => dynamic}
         @stored_defs << classDefinition
+        @stored_objects << classDefinition #have to put in stored objects to keep the index count correct
       end
       
       ob = OpenStruct.new #initialize an empty OpenStruct value holder
@@ -448,6 +458,9 @@ class AMFDeserializer
     if isReference
       reference = type >> 1
       if reference < @stored_objects.length
+        if @stored_objects[reference] == nil
+          raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant byteArray at index #{reference}, please tell aaron@rubyamf.org"))
+        end
         return @stored_objects[reference]
       else
         raise( RUBYAMFException.new(RUBYAMFException.UNDEFINED_OBJECT_REFERENCE_ERROR, "Reference to non existant byteArray #{reference}"))
@@ -474,7 +487,7 @@ class AMFDeserializer
  	end
 
  	def read_string
-    read_utf
+ 	  read_utf
  	end
 
 	def read_array
@@ -603,6 +616,5 @@ class AMFDeserializer
 		read_long_utf
 	end
 end
-
 end
 end
