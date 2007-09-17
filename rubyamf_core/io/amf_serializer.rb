@@ -330,29 +330,13 @@ class AMFSerializer
   
   def write_amf3_object(value)        
 		i = @stored_objects.index(value)
-		if(i != nil)
+		if i != nil
 		  reference = i << 1
 			write_amf3_integer(reference)
 		else
-		  begin
-		    members = value.get_members
-  			#if value.rmembers != nil
-  			#  members = value.rmembers
-  			#elsif(value.is_a?(OpenStruct))
-        #  members = value.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
-  			#else
-  			#  members = value.instance_variables.map{|mem| mem[1,mem.length]}
-  			#end
-		  rescue Exception => e
-		    #if exception from testing against value.rmembers is thrown, catch here and make sure to set members
-		    #if(value.is_a?(OpenStruct))
-        #  members = value.marshal_dump.keys.map{|k| k.to_s} #returns an array of all the keys in the OpenStruct
-  			#else
-  			#  members = value.instance_variables.map{|mem| mem[1,mem.length]}
-  			#end
-  	  end
+		  members = value.get_members
 	    
-			#Type this as a dynamic object
+			#type this as a dynamic object
 			write_byte(0x0B)
 			
 			classname = ""
@@ -383,7 +367,7 @@ class AMFSerializer
   
   def write_amf3_array(value)
     i = @stored_objects.index(value)
-    if (i != nil)
+    if i != nil
       reference = i << 1
       write_amf3_integer(reference)
     else
@@ -398,22 +382,29 @@ class AMFSerializer
   end
   
   def write_amf3_mixed_array(value) #ruby hash to AMF3 dynamic object
-    #Type this as a dynamic object
-		write_byte(0x0A)
-		write_byte(0x0B)
-		write_amf3_string("") #Anonymous object
-    value.each do |k,v|
-      write_amf3_string(k.to_s)
-      write_amf3(v)
-    end
-		write_amf3_string("")
+    i = @stored_objects.index(value)
+    if i != nil
+      reference = i << 1
+      #type as dynamic object
+      write_byte(0x0A)
+      write_amf3_integer(reference)
+    else
+      @stored_objects << value
+      #Type this as a dynamic object
+  		write_byte(0x0A)
+  		write_byte(0x0B)
+  		write_amf3_string("") #Anonymous object
+      value.each do |k,v|
+        write_amf3_string(k.to_s)
+        write_amf3(v)
+      end
+  		write_amf3_string("")
+  	end
   end
   
   def write_amf3_date(value)
     i = @stored_objects.index(value)
-    #force i as nil
-    i = nil #For some reason, references to Date objects just don't work, it causes Casting Errors in the player. Strange.
-    if (i != nil)
+    if i != nil
       reference = i << 1
       write_amf3_integer(reference)
     else
@@ -426,8 +417,6 @@ class AMFSerializer
   
   def write_time_as_amf3_date(value)
     i = @stored_objects.index(value)
-    #force i as nil
-    i = nil #For some reason, references to Date objects just don't work, it causes Casting Errors in the player. Strange.
     if i != nil
       reference = i << 1
       write_amf3_integer(reference)
