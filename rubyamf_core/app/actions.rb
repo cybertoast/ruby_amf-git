@@ -190,7 +190,7 @@ class InvokeAction
 		rescue LoadError => e
 			raise RUBYAMFException.new(RUBYAMFException.LOAD_CLASS_FILE, "The file #{@amfbody.class_file_uri}#{@amfbody.class_file} was not loaded. Check to make sure it exists in: #{RequestStore.service_path}")
 		rescue Exception => e
-		  raise RUBYAMFException.new(RUBYAMFException.LOAD_CLASS_FILE, "There was an error loading file #{@amfbody.class_file_uri}#{@amfbody.class_file}.")
+		  raise RUBYAMFException.new(RUBYAMFException.LOAD_CLASS_FILE, "There was an error loading file #{@amfbody.class_file_uri}#{@amfbody.class_file}. #{e.message}")
 		end
     
     #authentication, simple
