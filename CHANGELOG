@@ -1,3 +1,8 @@
+--changes 1.3.2c
+#updated the ActiveRecord::Base.update_nil_associations method. Added the 3rd open struct param. Which takes the original incoming ValueObject, and set's any similar associated model properties to the same values that are being assigned to the hash association properties. This was causing an issue with some models, not all. Not sure what the qualifications were for this being an issue, but it's fixed.
+#fixed incoming AMF stream object references when reading Objects.
+#Fixed outgoing AMF stream object references.
+
 --changes
 1.3.2b
 #Updated VoUtil again for incoming VO's. If any properties are nil, they're now deleted out of the open struct so that the resulting update hash for active record doesn't put in NULL into the database.
