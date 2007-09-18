@@ -348,7 +348,7 @@ class RailsInvokeAction
 		      if t.include?('.')
 		        t = t.split('.').last.downcase.to_s
 		      end
-  		    req.parameters[t.to_sym] = item
+  		    req.parameters[t.to_sym] = item.to_hash
   		    if i < 1
   		      if item.class.to_s == 'Object' || item.class.to_s == 'OpenStruct'
     		      if item.id != nil && item.id.to_s != 'NaN' && item.id != 0
