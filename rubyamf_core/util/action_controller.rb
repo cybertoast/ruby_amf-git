@@ -14,11 +14,7 @@ class ActionController::Base
   def render(options = nil, deprecated_status = nil, &block)
     raise DoubleRenderError, "Can only render or redirect once per action" if performed?
     if options.nil?
-      if self.rubyamf_attempt_file_render
-        return render_file(default_template_name, deprecated_status, true)
-      else
-        return
-      end
+      return render_file(default_template_name, deprecated_status, true)
     else
       #Backwards compatibility
       unless options.is_a?(Hash)
