@@ -305,11 +305,6 @@ class AMFSerializer
   end
   
 	def write_amf3_string(value)
-	  #this is a *hack* for
-	  if value == 'amf_id'
-	    value = 'id'
-	  end
-	  
     if(value == "")
       write_byte(0x01)
     else
@@ -626,10 +621,6 @@ class AMFSerializer
 
 	# Write a Flash String object
 	def write_string(string)
-	  #this is a *hack* to get around ruby's problem with using "id" on an object
-	  if string == 'amf_id'
-	    string = 'id'
-	  end
 		write_byte(2)
 		write_utf(string.to_s)
 	end
