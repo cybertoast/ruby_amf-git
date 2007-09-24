@@ -22,6 +22,7 @@ class VoUtil
         if map[:incoming] == classname
           vomap = map #store vomap
           if map[:type] != nil && map[:type].to_s == 'active_record'
+            os._explicitType = map[:map_to]
             vo = self.get_active_record_from_open_struct(os)
             active_rec = true
             break
