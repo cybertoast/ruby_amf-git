@@ -17,6 +17,10 @@ class MysqlAdapter
 		while row = result.fetch_hash
 			payload << row
 		end
+		#if only one row, make it an object
+		if payload.length == 1
+		  payload = payload[0]
+		end
 		payload
 	end
 end
