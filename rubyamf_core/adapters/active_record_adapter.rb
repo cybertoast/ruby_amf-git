@@ -41,7 +41,7 @@ class ActiveRecordAdapter
     initial_data = []
     column_names = um[0].get_column_names
     num_rows = um.length
-
+    
     c = 0
     0.upto(num_rows - 1) do
       o = OpenStruct.new
@@ -83,7 +83,7 @@ class ActiveRecordAdapter
     end
     initial_data
   end
-
+  
   #run the data extraction process on a single AR result
   def run_single(us)
     initial_data = []
@@ -116,7 +116,7 @@ class ActiveRecordAdapter
         associations.each do |associate|
           na = associate[1, associate.length]
           ar = us.send(:"#{na}")
-          if !ar.empty? && !ar.nil?
+          if !ar.nil?
             if(use_single?(ar))
               initial_data_2 = run_single(ar)   #recurse into single AR method for same data structure
             else
@@ -126,16 +126,17 @@ class ActiveRecordAdapter
           end
         end
       end
-      if us.single?
-        initial_data = o
-      else
-        initial_data << o
-      end
+      
+      #commented out following lines in 1.3.4 - this makes single active records "as_single" permanent no matter what
+      #if us.single?
+      initial_data = o
+      #else
+      #  initial_data << o
+      #end
       c += 1
     end
     initial_data
   end
-  
 end
 
 
