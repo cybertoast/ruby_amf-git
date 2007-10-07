@@ -88,7 +88,7 @@ class ActiveRecord::Base
   #This takes an update hash used in instantiating new ActiveRecord instances,
   #and updates any members that are considered associations but didn't
   #have any values sent with it (nil)
-  def self.update_nil_associations(klass, hash, orig_vo_openstruct)
+  def self.update_nil_associations(klass, hash, orig_vo_openstruct, isnew)
     os = orig_vo_openstruct
     associations = klass.reflect_on_all_associations
     if !associations.empty? && !associations.nil?
@@ -98,13 +98,17 @@ class ActiveRecord::Base
           if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
             hash[n] = nil
             eval("os.#{n} = nil")
-          end                                        
+          end
         
         elsif ass.macro == :has_many
           if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
             hash[n] = []
-            eval("os.#{n} = []")
-          end                                        
+            if isnew
+              os.delete_field(n.to_sym)
+            else
+              eval("os.#{n} = []")
+            end
+          end
 
         elsif ass.macro == :has_and_belongs_to_many
           if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'

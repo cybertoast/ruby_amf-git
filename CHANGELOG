@@ -1,3 +1,7 @@
+--changes 1.3.4
+#single mysql records are always returned as an object, not wrapped in an array anymore.
+#fixed small bug with incoming VO names. EI this wouldn't work: ValueObjects.regier({:incoming=>'vo.SectionVO',:map_to=>'Section',:outgoing=>'vo.SectionVO'})
+
 --changes 1.3.3b
 #updated rails parameter mapping for sending generic objects from flash/flex
 
