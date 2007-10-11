@@ -31,14 +31,7 @@ class RailsGateway < Gateway
 		RequestStore.actions = Array[PrepareAction.new, ClassAction.new, RailsInvokeAction.new, ResultAdapterAction.new] #override the actions 
 		RequestStore.rails = true
 	end
-	
-  #This allows you to toggle how incoming method parameters get sent to your controller method
-  #if false, parameters get sent to your controller in the method signature EX: myControllerMethod(param)
-  #if true, parameters get mapped to the "params" variable that is available in your controller
-	def use_params_hash=(val)
-	  RequestStore.use_params_hash = val
-	end
-	
+		
 private
 	#This just requires the config file so that that configuration code runs
 	def app_config

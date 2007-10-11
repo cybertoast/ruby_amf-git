@@ -35,10 +35,6 @@ class RubyamfController < ActionController::Base
 		  #set the services path relative to this gateway.servlet file
   		gateway.services_path = RUBYAMF_SERVICES
   		gateway.config_path = File.expand_path(RAILS_ROOT) + "/config/rubyamf/"
-  		
-		  #populate the params[] hash for controller methods with the remoting parameters sent, 
-		  #(instead of passing in through the method call)
-		  gateway.use_params_hash = true
 		  
   		#default log level (debug, info, warn, error, fatal, none)
   		gateway.log_level = 'none'

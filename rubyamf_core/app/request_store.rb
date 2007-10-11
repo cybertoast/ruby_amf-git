@@ -24,7 +24,6 @@ class RequestStore
   @flex_messaging = false
   @recordset_format
   @gzip = false
-  @use_params_hash
   @rails = false
   @rails_authentication
   @available_services = {}
@@ -56,7 +55,6 @@ class RequestStore
 	  attr_accessor :flex_messaging
 	  attr_accessor :recordset_format
 	  attr_accessor :gzip
-	  attr_accessor :use_params_hash
 	  attr_accessor :rails
 	  attr_accessor :rails_authentication
 	  attr_accessor :available_services
