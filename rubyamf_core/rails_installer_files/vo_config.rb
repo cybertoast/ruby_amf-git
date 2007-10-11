@@ -22,6 +22,12 @@
 # If your VO's aren't active_records, there are two instance variables that are injected to your class so that RubyAMF knows what they are.
 # '_explicitType' and 'rmembers'. Just a heads up if you inspect a VO. Don't be surprised by those.
 #
+#=> Translate Case on VOs
+# Most actionscript uses camel case instead of snake case. Set ValueObjects.translate_case to true if wanted
+# An incoming property like: myProperty gets turned into my_property
+# An outgoing property like my_property gets turned into myProperty
+#
+ValueObjects.translate_case = false
 #ValueObjects.register({:incoming => 'Person', :map_to => 'Person', :outgoing => 'Person', :type => 'active_record'})
 #ValueObjects.register({:incoming => 'User', :map_to => 'User', :outgoing => 'User', :type => 'active_record'})
 #ValueObjects.register({:incoming => 'Address', :map_to => 'Address', :outgoing => 'Address', :type => 'active_record'})
