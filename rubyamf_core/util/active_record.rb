@@ -118,7 +118,6 @@ class ActiveRecord::Base
   def self.update_nans(hash)
     hash.each do |k,v|
       if v.to_s == 'NaN'
-        hash[k] = nil
         hash.delete(k.to_s)
       end
     end
