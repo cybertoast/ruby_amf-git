@@ -1,25 +1,23 @@
 class ActiveRecord::Base
   
+  #member names to ignore on incoming VOs
+  def self.magic_fields
+    ['created_at','created_on','updated_at','updated_on']
+  end
+  
   #This holds the original incoming Value Object from deserialization time, as when an incoming VO with an 'id' property
   #on it is found, it is 'found' (Model.find(id)) in the DB (instead of Model.new(hash)). So right before the params hash
   #is updated for the rails request, I slip in this original object so you can do an "update_attributes(params[:model])"
   #and the correct 'update' values will be used.
   attr_accessor :original_vo_from_deserialization
   
-  #This member, and the "single" methods are used for ActiveRecord#as_single!
-  #which causes RubyAMF to write just an object to the stream, instead of wrapping
-  #the object in an array.
-  @rubyamf_single_ar = false
   def as_single!
-    @rubyamf_single_ar = true
+    SDTOUT.puts "ActiveRecord::Base#as_single! is no longer needed, all single active records return as an object. This warning will be taken out in 1.4, please update your controller"
     self
   end
   def single!
-    @rubyamf_single_ar = true
+    SDTOUT.puts "ActiveRecord::Base#as_single! is no longer needed, all single active records return as an object. This warning will be taken out in 1.4, please update your controller"
     self
-  end
-  def single?
-    @rubyamf_single_ar
   end
   
   #get any associated data on an AR instance. I don't use AR reflection here
@@ -67,8 +65,7 @@ class ActiveRecord::Base
     column_names = self.get_column_names
     
     #first write the primary "attributes" on this AR object
-    column_names.each_with_index do |v,k|
-      k = column_names[k]
+    column_names.each do |k|
       val = self.send(:"#{k}")
       o[k] = val
     end
@@ -95,25 +92,21 @@ class ActiveRecord::Base
       associations.each do |ass|
         n = ass.name.to_s
         if ass.macro == :belongs_to
-          if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
-            hash[n] = nil
-            eval("os.#{n} = nil")
+          if hash[n].nil? || hash[n].empty?
+            os.delete_field(n.to_sym)
+            hash.delete(n.to_s)
           end
         
-        elsif ass.macro == :has_many
-          if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
-            hash[n] = []
-            if isnew
-              os.delete_field(n.to_sym)
-            else
-              eval("os.#{n} = []")
-            end
+        elsif ass.macro == :has_many || :has_and_belongs_to_many
+          if hash[n].nil? || hash[n].empty?
+            os.delete_field(n.to_sym)
+            hash.delete(n.to_s)
           end
-
-        elsif ass.macro == :has_and_belongs_to_many
-          if hash[n].nil? || hash[n].empty? || hash[n].to_s == 'NaN' || hash[n].to_s == 'undefined'
-            hash[n] = []
-            eval("os.#{n} = []")
+          
+        elsif ass.macro == :through
+          if hash[n].nil? || hash[n].empty?
+            os.delete_field(n.to_sym)
+            hash.delete(n.to_s)
           end
         end
       end
@@ -126,6 +119,7 @@ class ActiveRecord::Base
     hash.each do |k,v|
       if v.to_s == 'NaN'
         hash[k] = nil
+        hash.delete(k.to_s)
       end
     end
     hash

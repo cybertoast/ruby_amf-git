@@ -111,6 +111,7 @@ class VoUtil
   
   #get an active record from an incoming VO openStruct
   def self.get_active_record_from_open_struct(os)
+    self.camels_to_snakes!(os) if ValueObjects.translate_case
     if os._explicitType == nil
       return nil
     end
@@ -128,14 +129,13 @@ class VoUtil
       if os.id != 0 && os.id.to_s != 'NaN' && os.id != nil
         ActiveRecord::Base.update_nil_associations(Object.const_get(classname),hash,os,true) #update the hash so nil assotiations don't mess up AR
         ar = Object.const_get(classname).find(os.id)
-        if os.created_at == nil
-          os.delete_field('created_at')
-        end
-        os.delete_field('updated_at') #always delete any updated_at fields, let AR put in the updated at
         os.get_members.each do |k| #go through each value in the object, if it's nil don't put it in the update hash
           val = os.send(:"#{k}")
-          if val == nil || val == NaN
-            os.delete_field(k)
+          #delete incoming members that are nil/NaN or if we explicitly ignore it because of magic_fields
+          if ActiveRecord::Base.magic_fields.include?(k) || val == nil || val == NaN
+            os.delete_field(k.to_sym)
+            hash.delete(k.to_s)
+            next
           end
         end
       else
@@ -150,5 +150,37 @@ class VoUtil
     #store the original vo for later, (in the RailsInvokeAction)
     ar.original_vo_from_deserialization = os
     return ar
+  end
+  
+  #if we're expecting vo camel case properties to be mapped to ar snake case properties, fix
+  #open struct representations here
+  def self.snakes_to_camels!(os)
+    os.get_members.each do |k|
+      camel_key = k.camelize(:lower)
+      if camel_key != k && k != '_explicitType' && k != 'amf_id'
+        if os.send(:"#{k}")
+          eval("os.#{camel_key} = os.#{k}")
+        else
+          eval("os.#{camel_key} = nil")
+        end
+        os.delete_field("#{k}")
+      end
+    end
+  end
+  
+  #if we're expecting vo camel case properties to be mapped to ar snake case properties, fix
+  #open struct representations here
+  def self.camels_to_snakes!(os)
+    os.get_members.each do |k|                                                               
+      val = os.send(:"#{k}")
+      if k.snake_case != k && k != '_explicitType' && k != 'amf_id'
+        if val
+          eval("os.#{k.snake_case} = os.#{k}")
+        else
+          eval("os.#{k.snake_case} = nil")
+        end
+        os.delete_field("#{k}")
+      end
+    end
   end
 end

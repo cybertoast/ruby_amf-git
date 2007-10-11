@@ -56,10 +56,11 @@ class ActiveRecordAdapter
       end
       
       #first write the primary "attributes" on this AR object
-      column_names.each_with_index do |v,k|
-        k = column_names[k]
-        val = um[c].send(:"#{k}")
-        eval("o.#{k}=val")
+      #no need for an index 
+      column_names.each do |v| 
+        vo_property = ValueObjects.translate_case ? v.camelize(:lower) : v
+        val = um[c].send(:"#{v}")
+        eval("o.#{vo_property}=val")
       end
       
       associations = um[0].get_associates
@@ -68,7 +69,7 @@ class ActiveRecordAdapter
         associations.each do |associate|
           na = associate[1, associate.length]
           ar = um[c].send(:"#{na}")
-          if !ar.empty? && !ar.nil?
+          if !ar.nil?
             if(use_single?(ar))
               initial_data_2 = run_single(ar)   #recurse into single AR method for same data structure
             else
@@ -104,10 +105,12 @@ class ActiveRecordAdapter
       end
       
       #first write the primary "attributes" on this AR object
-      column_names.each_with_index do |v,k|
-        k = column_names[k]
-        val = us.send(:"#{k}")
-        eval("o.#{k}=val")
+      #dont need index k.. 
+      column_names.each do |v|
+        #k = column_names[k]
+        vo_property = ValueObjects.translate_case ? v.camelize(:lower) : v
+        val = us[c].send(:"#{v}")
+        eval("o.#{vo_property}=val")
       end
       
       associations = us.get_associates
@@ -121,6 +124,18 @@ class ActiveRecordAdapter
               initial_data_2 = run_single(ar)   #recurse into single AR method for same data structure
             else
               initial_data_2 = run_multiple(ar) #recurse into multiple AR method for same data structure
+            end
+
+	          #initial stage of adding in through support... check reflection for stuff that's not cought by get_associates
+            #need to make sure run_multiple is the right choice..  im pretty sure a model with through msut be single 
+            us.class.reflections.keys.each do |x|
+              obj="#{x}"
+              unless obj == na
+                isThrough = us.send(x)
+                #debugger
+                through_data = run_multiple(isThrough)
+                eval("o.#{obj}=through_data")
+              end
             end
             eval("o.#{na}=initial_data_2")
           end

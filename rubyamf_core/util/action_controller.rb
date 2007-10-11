@@ -7,13 +7,24 @@ class ActionController::Base
   attr_accessor :amf_content
   attr_accessor :rubyamf_attempt_file_render
   
-  def amf_credentials
-    return RequestStore.rails_authentication
+  #Higher level "credentials" method that returns credentials wether or not 
+  #it was from setRemoteCredentials, or setCredentials
+  def credentials
+    a = amf_credentials
+    h = html_credentials
+    if !a.nil?
+      return a
+    elsif !h.nil?
+      return h
+    end
+    nil
   end
   
   def render(options = nil, deprecated_status = nil, &block)
     raise DoubleRenderError, "Can only render or redirect once per action" if performed?
-    if options.nil?
+    if self.is_amf
+      #do nothing
+    elsif options.nil?
       return render_file(default_template_name, deprecated_status, true)
     else
       #Backwards compatibility
@@ -87,4 +98,25 @@ class ActionController::Base
       end
     end
   end
+  
+private
+  #setCredentials access
+  def amf_credentials
+    return RequestStore.rails_authentication
+  end
+  
+  #remoteObject setRemoteCredentials retrieval
+  def html_credentials
+    #debugger
+    #gets BASIC auth info
+    auth_data = request.env['RAW_POST_DATA']
+    auth_data = auth_data.scan(/DSRemoteCredentials.*?\001/)
+    if auth_data.size > 0
+      auth_data = auth_data[0][21, auth_data[0].length-22]
+      remote_auth = Base64.decode64(auth_data).split(':')[0..1]
+    else
+      remote_auth = [nil, nil]
+    end
+    return {:username => remote_auth[0], :password => remote_auth[1]}
+  end  
 end
