@@ -12,13 +12,10 @@ class ActiveRecord::Base
   attr_accessor :original_vo_from_deserialization
   
   def as_single!
-    SDTOUT.puts "ActiveRecord::Base#as_single! is no longer needed, all single active records return as an object. This warning will be taken out in 1.4, please update your controller"
+    SDTOUT.puts "ActiveRecord::Base#as_single! is no longer needed, all single active records return as an object. Please update your controller"
     self
   end
-  def single!
-    SDTOUT.puts "ActiveRecord::Base#as_single! is no longer needed, all single active records return as an object. This warning will be taken out in 1.4, please update your controller"
-    self
-  end
+  alias single! as_single!
   
   #get any associated data on an AR instance. I don't use AR reflection here
   #because it causes problems when recursing in the active_record_adapter.
