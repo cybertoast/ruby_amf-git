@@ -55,7 +55,7 @@ module RubyAMF
           rescue ActiveRecord::StatementInvalid => e
             # This error occurs during migrations, since the AR constructed above will check its columns, but the table won't exist yet.
             # We'll ignore the error if we're migrating.
-            raise unless ARGV[0] =~ /migrate$/
+            raise unless ARGV.include?("migrate") or ARGV.include?("db:migrate")
           end
         end
         
